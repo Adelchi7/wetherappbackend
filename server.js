@@ -1,19 +1,20 @@
-const express = require("express");
+const express = require('express');
+const cors = require('cors');
 const app = express();
 const port = process.env.PORT || 3000;
-const API_URL = "https://wetherappbackend.onrender.com";
 
-fetch(`${API_URL}/wetherappbackend`)
+app.use(cors());
 
-
+// Ping endpoint for frontend to wake backend
 app.get("/ping", (req, res) => {
-  res.json({ ok: true });
+res.sendStatus(200); // simple 200 OK response
 });
 
+// Optional test route
 app.get("/app", (req, res) => {
-  res.send("<h1>Backend is awake!</h1>");
+res.send("<h1>Backend is awake!</h1>");
 });
 
 app.listen(port, () => {
-  console.log(`Backend running on port ${port}`);
+console.log(`Backend running on port ${port}`);
 });
