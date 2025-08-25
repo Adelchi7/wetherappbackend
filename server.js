@@ -1,6 +1,10 @@
 const express = require("express");
 const app = express();
 const port = process.env.PORT || 3000;
+const API_URL = "https://wetherappbackend.onrender.com";
+
+fetch(`${API_URL}/wetherappbackend`)
+
 
 app.get("/ping", (req, res) => {
   res.json({ ok: true });
