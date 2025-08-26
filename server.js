@@ -40,7 +40,7 @@ app.post("/api/choice", async (req, res) => {
 
 // Serve frontend index.html on root
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "../wetherappFrontend/index.html"));
+  res.sendFile(path.join(__dirname, "../wetherappfrontend/index.html"));
 });
 
 // Optional: if you want to keep old /app route pointing to frontend.html in backend folder
