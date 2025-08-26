@@ -1,6 +1,5 @@
 const express = require("express");
-const cors = require("cors");
-const fetch = require("node-fetch"); // install with: npm install node-fetch
+const cors = require("cors"); // install with: npm install node-fetch
 
 const app = express();
 const port = process.env.PORT || 3000;
