@@ -1,17 +1,21 @@
 const express = require("express");
-const cors = require("cors"); // install with: npm install cors
+const cors = require("cors");
 const app = express();
 const path = require("path");
 const port = process.env.PORT || 3000;
 
 app.use(cors());
-app.use(express.json()); 
-app.use(express.static(__dirname)); // optional: serve static assets
+app.use(express.json());
 
+// Serve static frontend files from the wetherappFrontend folder
+app.use(express.static(path.join(__dirname, "../wetherappFrontend")));
+
+// Ping endpoint
 app.get("/ping", (req, res) => {
   res.sendStatus(200);
 });
 
+// POST endpoint for color choice
 app.post("/api/choice", async (req, res) => {
   const { color } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
@@ -34,6 +38,12 @@ app.post("/api/choice", async (req, res) => {
   res.json({ color, location });
 });
 
+// Serve frontend index.html on root
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../wetherappFrontend/index.html"));
+});
+
+// Optional: if you want to keep old /app route pointing to frontend.html in backend folder
 app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend.html"));
 });
