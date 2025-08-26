@@ -44,10 +44,10 @@ app.get("/", (req, res) => {
 });
 
 // Optional: if you want to keep old /app route pointing to frontend.html in backend folder
-/* app.get("/app", (req, res) => {
+app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend.html"));
 });
- */
+
 app.listen(port, () => {
   console.log(`Backend running on port ${port}`);
 });
