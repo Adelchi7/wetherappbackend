@@ -8,7 +8,9 @@ app.use(cors());
 app.use(express.json());
 
 // Serve the frontend folder as static
-app.use('/frontend', express.static(path.join(__dirname, "../wetherappfrontend")));
+// Serve the wetherappFrontend folder under /frontend path
+app.use("/frontend", express.static(path.join(__dirname, "../wetherappFrontend")));
+
 
 // Ping endpoint
 app.get("/ping", (req, res) => {
