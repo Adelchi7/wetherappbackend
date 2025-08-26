@@ -8,7 +8,7 @@ app.use(cors());
 app.use(express.json());
 
 // Serve the frontend folder as static
-app.use('/frontend', express.static(path.join(__dirname, "../frontendapp")));
+app.use('/frontend', express.static(path.join(__dirname, "../wetherappFrontend")));
 
 // Ping endpoint
 app.get("/ping", (req, res) => {
@@ -38,15 +38,16 @@ app.post("/api/choice", async (req, res) => {
   res.json({ color, location });
 });
 
-app.get("/app", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontendapp/frontend.html"));
+// Serve frontend index.html on root
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../wetherappFrontend/index.html"));
 });
 
 // Optional: if you want to keep old /app route pointing to frontend.html in backend folder
 /* app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend.html"));
-}); */
-
+});
+ */
 app.listen(port, () => {
   console.log(`Backend running on port ${port}`);
 });
