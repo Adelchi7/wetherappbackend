@@ -12,7 +12,7 @@ res.sendStatus(200); // simple 200 OK response
 
 // Optional test route
 app.get("/app", (req, res) => {
-res.send("<h1>Backend is awake!</h1>");
+res.send(frontend.html);
 });
 
 app.listen(port, () => {

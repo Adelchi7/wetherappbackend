@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Color Picker</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; margin-top: 50px; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    #result { margin-top: 20px; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Pick a Color</h1>
+  <div id="colors">
+    <button onclick="chooseColor('Red')">Red</button>
+    <button onclick="chooseColor('Green')">Green</button>
+    <button onclick="chooseColor('Blue')">Blue</button>
+  </div>
+
+  <div id="result"></div>
+
+  <script>
+    async function chooseColor(color) {
+      const res = await fetch("/api/choice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ color })
+      });
+
+      const data = await res.json();
+      document.getElementById("result").innerHTML =
+        `You chose <b style="color:${data.color}">${data.color}</b><br>` +
+        `Location: ${data.location}`;
+    }
+  </script>
+</body>
+</html>
