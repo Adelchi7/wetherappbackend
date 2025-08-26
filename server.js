@@ -1,36 +1,27 @@
 const express = require("express");
 const cors = require("cors");
-const app = express();
 const path = require("path");
+const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// Serve the frontend folder as static
-// Serve the wetherappFrontend folder under /frontend path
+// Serve the frontend JS/HTML folder as static
 app.use("/frontend", express.static(path.join(__dirname, "../wetherappFrontend")));
 
-
 // Ping endpoint
-app.get("/ping", (req, res) => {
-  res.sendStatus(200);
-});
+app.get("/ping", (req, res) => res.sendStatus(200));
 
-// POST endpoint for color choice
+// POST endpoint
 app.post("/api/choice", async (req, res) => {
   const { color } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
-  if (!allowedColors.includes(color)) {
-    return res.status(400).json({ error: "Invalid color" });
-  }
-
-  const ip =
-    req.headers["x-forwarded-for"]?.split(",")[0] ||
-    req.socket.remoteAddress;
+  if (!allowedColors.includes(color)) return res.status(400).json({ error: "Invalid color" });
 
   let location = "Unknown";
   try {
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
     const geoRes = await fetch(`https://ipapi.co/${ip}/city/`);
     if (geoRes.ok) location = await geoRes.text();
   } catch (err) {
@@ -40,12 +31,14 @@ app.post("/api/choice", async (req, res) => {
   res.json({ color, location });
 });
 
-// Serve frontend index.html on root
-
-
-// Optional: if you want to keep old /app route pointing to frontend.html in backend folder
+// Serve frontend.html as the app
 app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend.html"));
+});
+
+// Temporary test route to verify script.js loading
+app.get("/testscript", (req, res) => {
+  res.sendFile(path.join(__dirname, "../wetherappFrontend/script.js"));
 });
 
 app.listen(port, () => {
