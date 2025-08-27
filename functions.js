@@ -1,6 +1,4 @@
-// functions.js
-const { color, visitorInfo } = req.body;
-const ip = visitorInfo?.ip || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+
 
 // functions.js
 

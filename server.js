@@ -25,14 +25,22 @@ async function getLocationFromIP(ip) {
 app.post("/api/choice", async (req, res) => {
   const { color } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
-  if (!allowedColors.includes(color)) return res.status(400).json({ error: "Invalid color" });
+  if (!allowedColors.includes(color)) {
+    return res.status(400).json({ error: "Invalid color" });
+  }
 
   let location = "Unknown";
   try {
-    const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
-    console.log("Detected IP:", ip);
-    const geoRes = await fetch(`https://ipapi.co/${ip}/city/`);
-    if (geoRes.ok) location = await geoRes.text();
+    const ip = req.headers["x-forwarded-for"]?.split(",")[0];
+    console.log("IP detected:", ip);
+
+    if (ip) {
+      const geoRes = await fetch(`http://ip-api.com/json/${ip}`);
+      if (geoRes.ok) {
+        const data = await geoRes.json();
+        location = `${data.city || "Unknown"}, ${data.country || "Unknown"}`;
+      }
+    }
   } catch (err) {
     console.error("Geo lookup failed", err);
   }
