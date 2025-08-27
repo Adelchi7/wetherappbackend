@@ -1,4 +1,6 @@
 // functions.js
+const { color, visitorInfo } = req.body;
+const ip = visitorInfo?.ip || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
 
 async function chooseColor(color) {
   const resultDiv = document.getElementById("result");
