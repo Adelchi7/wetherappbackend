@@ -33,6 +33,16 @@ app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend.html"));
 });
 
+app.get("/functions.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "functions.js"));
+});
+
+
+app.get("/functions.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "functions.js"));
+});
+
+
 app.listen(port, () => {
   console.log(`Backend running on port ${port}`);
 });
