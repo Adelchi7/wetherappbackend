@@ -25,12 +25,16 @@ async function getLocationFromIP(ip) {
 app.post("/api/choice", async (req, res) => {
   const { color, visitorInfo } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
-  if (!allowedColors.includes(color)) return res.status(400).json({ error: "Invalid color" });
+  if (!allowedColors.includes(color)) {
+    return res.status(400).json({ error: "Invalid color" });
+  }
 
   let location = "Unknown";
   try {
-    // Prefer frontend-sent public IP
-    const ip = visitorInfo?.ip || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+    const ip = visitorInfo?.ip || 
+               req.headers["x-forwarded-for"]?.split(",")[0] || 
+               req.socket.remoteAddress;
+
     console.log("Using IP for geo lookup:", ip);
 
     const geoRes = await fetch(`https://ipapi.co/${ip}/city/`);
@@ -41,6 +45,7 @@ app.post("/api/choice", async (req, res) => {
 
   res.json({ color, location });
 });
+
 
 
 // Serve frontend.html as the app
