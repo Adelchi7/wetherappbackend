@@ -21,43 +21,43 @@ async function getCoordinates() {
 }
 
 async function chooseColor(color) {
-  // Step 1: Try to get GPS coordinates
   let coords = null;
-  try {
-    coords = await getCoordinates();
-  } catch (err) {
-    console.warn("Geolocation failed, falling back to IP", err);
-  }
+  let ip = null;
 
-  // Step 2: If no coordinates, get public IP
-  let ip = "unknown";
-  if (!coords) {
+  // 1️⃣ Try browser geolocation first
+  try {
+    coords = await getCoordinates(); // returns { latitude, longitude }
+  } catch (err) {
+    console.warn("Geolocation failed, falling back to IP:", err);
+
+    // 2️⃣ If denied, fetch public IP
     try {
       const ipRes = await fetch("https://api.ipify.org?format=json");
       const ipData = await ipRes.json();
       ip = ipData.ip;
     } catch (e) {
       console.warn("Could not fetch IP", e);
+      ip = "unknown";
     }
   }
 
-  // Step 3: Build visitor info
+  // 3️⃣ Build visitor info
   const visitorInfo = {
-    ip,
-    coords, // may be null if IP fallback
+    coords,   // may be null
+    ip,       // only set if geolocation denied
     userAgent: navigator.userAgent,
     language: navigator.language,
     platform: navigator.platform
   };
 
-  // Send to backend
+  // 4️⃣ Send to backend
   const res = await fetch("/api/choice", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ color, visitorInfo })
   });
 
-  // Parse JSON safely, fallback to default if backend fails
+  // 5️⃣ Safely parse JSON
   const data = await res.json().catch(() => ({ color, location: "Unknown" }));
 
   document.getElementById("result").innerHTML =
