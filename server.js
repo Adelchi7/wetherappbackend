@@ -12,7 +12,6 @@ app.get("/ping", (req, res) => res.sendStatus(200));
 
 // POST endpoint for color choice + location
 app.post("/api/choice", async (req, res) => {
-  console.log("Received coords from frontend:", visitorInfo?.coords);
   const { color, visitorInfo } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
 
@@ -23,10 +22,9 @@ app.post("/api/choice", async (req, res) => {
   let location = "Unknown";
 
   try {
-    // 1️⃣ Use coordinates if provided
+    // Prefer coordinates
     if (visitorInfo?.coords?.latitude && visitorInfo?.coords?.longitude) {
       const { latitude, longitude } = visitorInfo.coords;
-      // Reverse geocode using free API (OpenStreetMap)
       const geoRes = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
         {
@@ -36,27 +34,21 @@ app.post("/api/choice", async (req, res) => {
           }
         }
       );
-
-        if (geoRes.ok) {
-          const data = await geoRes.json();
-          console.log("Reverse geocode response:", data);
-          location = data.address?.city || data.address?.town || data.address?.village || "Unknown";
-        }
-
-    } else {
-      // 2️⃣ Fallback to IP-based lookup
-      const ip = visitorInfo?.ip || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
-      console.log("Using IP for geo lookup:", ip);
-
-      const geoRes = await fetch(`https://ipapi.co/${ip}/city/`);
+      if (geoRes.ok) {
+        const data = await geoRes.json();
+        location = data.address?.city || data.address?.town || data.address?.village || "Unknown";
+      }
+    } else if (visitorInfo?.ip) {
+      const geoRes = await fetch(`https://ipapi.co/${visitorInfo.ip}/city/`);
       if (geoRes.ok) {
         location = await geoRes.text();
       }
     }
   } catch (err) {
-    console.error("Geo lookup failed", err);
+    console.error("Geo lookup failed:", err);
   }
 
+  // Always return JSON
   res.json({ color, location });
 });
 

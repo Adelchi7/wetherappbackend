@@ -50,14 +50,16 @@ async function chooseColor(color) {
     platform: navigator.platform
   };
 
-  // Step 4: Send to backend
+  // Send to backend
   const res = await fetch("/api/choice", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ color, visitorInfo })
   });
 
-  const data = await res.json();
+  // Parse JSON safely, fallback to default if backend fails
+  const data = await res.json().catch(() => ({ color, location: "Unknown" }));
+
   document.getElementById("result").innerHTML =
     `You chose <b style="color:${data.color}">${data.color}</b><br>` +
     `Location: ${data.location}`;
