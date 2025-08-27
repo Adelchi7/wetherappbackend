@@ -1,27 +1,56 @@
-
-
 // functions.js
 
+// Helper: get coordinates from browser
+async function getCoordinates() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) return reject("Geolocation not supported");
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+      },
+      (error) => {
+        reject(error.message);
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
+  });
+}
+
 async function chooseColor(color) {
-  // Get public IP from ipify
-  let ip = "unknown";
+  // Step 1: Try to get GPS coordinates
+  let coords = null;
   try {
-    const ipRes = await fetch("https://api.ipify.org?format=json");
-    const ipData = await ipRes.json();
-    ip = ipData.ip;
-  } catch (e) {
-    console.warn("Could not fetch IP", e);
+    coords = await getCoordinates();
+  } catch (err) {
+    console.warn("Geolocation failed, falling back to IP", err);
   }
 
-  // Build visitor info
+  // Step 2: If no coordinates, get public IP
+  let ip = "unknown";
+  if (!coords) {
+    try {
+      const ipRes = await fetch("https://api.ipify.org?format=json");
+      const ipData = await ipRes.json();
+      ip = ipData.ip;
+    } catch (e) {
+      console.warn("Could not fetch IP", e);
+    }
+  }
+
+  // Step 3: Build visitor info
   const visitorInfo = {
     ip,
+    coords, // may be null if IP fallback
     userAgent: navigator.userAgent,
     language: navigator.language,
     platform: navigator.platform
   };
 
-  // Send to backend
+  // Step 4: Send to backend
   const res = await fetch("/api/choice", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -42,6 +71,6 @@ async function submitInput(data) {
   });
 }
 
+// Expose globally for onclick handlers
 window.chooseColor = chooseColor;
 window.submitInput = submitInput;
-
