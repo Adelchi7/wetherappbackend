@@ -12,6 +12,7 @@ app.get("/ping", (req, res) => res.sendStatus(200));
 
 // POST endpoint for color choice + location
 app.post("/api/choice", async (req, res) => {
+  console.log("Received coords from frontend:", visitorInfo?.coords);
   const { color, visitorInfo } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
 
@@ -27,12 +28,21 @@ app.post("/api/choice", async (req, res) => {
       const { latitude, longitude } = visitorInfo.coords;
       // Reverse geocode using free API (OpenStreetMap)
       const geoRes = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+        {
+          headers: {
+            "User-Agent": "WetherAppBackend/1.0 (+https://yourdomain.com)",
+            "Accept-Language": "en"
+          }
+        }
       );
-      if (geoRes.ok) {
-        const data = await geoRes.json();
-        location = data.address?.city || data.address?.town || data.address?.village || "Unknown";
-      }
+
+        if (geoRes.ok) {
+          const data = await geoRes.json();
+          console.log("Reverse geocode response:", data);
+          location = data.address?.city || data.address?.town || data.address?.village || "Unknown";
+        }
+
     } else {
       // 2️⃣ Fallback to IP-based lookup
       const ip = visitorInfo?.ip || req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
