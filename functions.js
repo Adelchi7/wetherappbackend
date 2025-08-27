@@ -1,7 +1,5 @@
 // functions.js
 
-// functions.js
-
 async function chooseColor(color) {
   const res = await fetch("/api/choice", {
     method: "POST",

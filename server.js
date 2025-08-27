@@ -7,9 +7,6 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Serve the frontend JS/HTML folder as static
-app.use("/frontend", express.static(path.join(__dirname, "../wetherappFrontend")));
-
 // Ping endpoint
 app.get("/ping", (req, res) => res.sendStatus(200));
 
@@ -34,11 +31,6 @@ app.post("/api/choice", async (req, res) => {
 // Serve frontend.html as the app
 app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend.html"));
-});
-
-// Temporary test route to verify script.js loading
-app.get("/testscript", (req, res) => {
-  res.sendFile(path.join(__dirname, "../wetherappFrontend/script.js"));
 });
 
 app.listen(port, () => {
