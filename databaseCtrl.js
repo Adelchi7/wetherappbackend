@@ -20,13 +20,12 @@ const mongoURI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PA
 
 async function connectDB() {
   if (mongoose.connection.readyState === 0) {
-    await mongoose.connect(mongoURI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    console.log("Connecting to MongoDB at URI:", mongoURI.replace(/:(.*)@/, ":****@"));
+    await mongoose.connect(mongoURI); // options not needed in Mongoose 7+
     console.log("✅ MongoDB connected!");
   }
 }
+
 
 // Insert a single visitor
 async function insertVisitorData(data) {
