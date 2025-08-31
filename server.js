@@ -71,7 +71,12 @@ app.post("/api/choice", async (req, res) => {
       location: { type: "Point", coordinates }, // GeoJSON
     });
 
-    res.json({ success: true, visitor: savedVisitor });
+    res.json({
+      success: true,
+      color: savedVisitor.color,
+      location: savedVisitor.city, // human-readable city
+    });
+
   } catch (err) {
     console.error("MongoDB insert error:", err.message, err.errors || err);
     res.status(500).json({ error: "Failed to store visitor data" });
