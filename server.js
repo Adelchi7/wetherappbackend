@@ -93,6 +93,19 @@ app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend.html"));
 });
 
+// GET all visitor data
+app.get("/api/visitors", async (req, res) => {
+  try {
+    await connectDB();
+    const visitors = await Visitor.find({}, { color: 1, location: 1, _id: 0 }); // adjust based on your schema
+    res.json(visitors);
+  } catch (err) {
+    console.error("Error fetching visitors:", err);
+    res.status(500).json({ error: "Failed to fetch visitors" });
+  }
+});
+
+
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
   res.sendFile(path.join(__dirname, "functions.js"));

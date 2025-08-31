@@ -92,6 +92,36 @@ async function submitInput(data) {
   }
 }
 
+async function loadVisitorMap() {
+  const res = await fetch("/api/visitors");
+  const visitors = await res.json();
+
+  // Initialize map centered globally
+  const map = L.map("visitorMap").setView([20, 0], 2);
+
+  // Add OpenStreetMap tiles
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "© OpenStreetMap contributors",
+  }).addTo(map);
+
+  // Add pins
+  visitors.forEach(v => {
+    const [lon, lat] = v.location.coordinates;
+    L.circleMarker([lat, lon], {
+      radius: 8,
+      fillColor: v.color.toLowerCase(),
+      color: "#000",
+      weight: 1,
+      opacity: 1,
+      fillOpacity: 0.8
+    }).addTo(map)
+      .bindPopup(`Color: ${v.color}`);
+  });
+}
+
+loadVisitorMap();
+
+
 
 // Expose globally for onclick handlers
 window.chooseColor = chooseColor;
