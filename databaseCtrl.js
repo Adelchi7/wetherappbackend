@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 // Schema for visitor data
 const visitorSchema = new mongoose.Schema({
   color: { type: String, required: true },
-  city: { type: String, default: "Unknown" },   // <--- add this
+  city: { type: String, default: "Unknown" },
   location: {
     type: { type: String, enum: ["Point"], required: true },
     coordinates: { type: [Number], required: true },
@@ -41,7 +41,9 @@ async function getAllVisitorsData() {
   return await Visitor.find();
 }
 
+// Export everything needed
 module.exports = {
+  connectDB,           // now available to server.js
   insertVisitorData,
   getAllVisitorsData,
 };
