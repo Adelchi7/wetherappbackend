@@ -92,37 +92,44 @@ async function submitInput(data) {
   }
 }
 
-function patchLat(lat, targetKm) {
-  const degLatSize = targetKm / 111;
-  return Math.round(lat / degLatSize) * degLatSize;
-}
-
-function patchLon(lon, lat, targetKm) {
-  const degLonSize = targetKm / (111 * Math.cos(lat * Math.PI / 180));
-  return Math.round(lon / degLonSize) * degLonSize;
-}
-
 async function loadVisitorMap() {
   const res = await fetch("/api/visitors");
   const visitors = await res.json();
-  console.log('>>>>>>> visitors ' + JSON.stringify(visitors, null, 2));
+  console.log('>>>>>>> visitors', visitors);
 
   const targetKm = 100;
 
-  const map = L.map("visitorMap").setView([20, 0], 2);
+  // --- patching functions ---
+  function patchLat(lat, targetKm) {
+    const degLatSize = targetKm / 111;
+    return Math.round(lat / degLatSize) * degLatSize;
+  }
+
+  function patchLon(lon, lat, targetKm) {
+    const degLonSize = targetKm / (111 * Math.cos(lat * Math.PI / 180));
+    return Math.round(lon / degLonSize) * degLonSize;
+  }
+
+  // --- initialize map near data ---
+  const map = L.map("visitorMap").setView([42.35, 13.4], 6); // L’Aquila
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 
+  // --- prepare heatmap points ---
   const heatPoints = visitors.map(v => {
-    const [lon, lat] = v.location.coordinates;
-    return [patchLat(lat, targetKm), patchLon(lon, lat, targetKm), 1];
+    const [lon, lat] = v.location.coordinates;   // MongoDB: [lon, lat]
+    const snappedLat = patchLat(lat, targetKm);
+    const snappedLon = patchLon(lon, lat, targetKm);
+    return [snappedLat, snappedLon, 1];         // Leaflet: [lat, lon, intensity]
   });
 
-  L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(map);
+  // --- add heatmap ---
+  L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
 }
 
 loadVisitorMap();
+
 
 
 
