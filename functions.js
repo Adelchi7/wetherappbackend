@@ -26,7 +26,7 @@ async function chooseColor(color) {
 
   // 1️⃣ Try browser geolocation first
   try {
-    coords = await getCoordinates(); // returns { latitude, longitude }
+    coords = await getCoordinates(); // should return { latitude, longitude }
   } catch (err) {
     console.warn("Geolocation failed, falling back to IP:", err);
 
@@ -43,8 +43,10 @@ async function chooseColor(color) {
 
   // 3️⃣ Build visitor info
   const visitorInfo = {
-    coords,   // may be null
-    ip,       // only set if geolocation denied
+    coords: coords
+      ? { latitude: coords.latitude, longitude: coords.longitude } // keep raw values
+      : null,
+    ip, // only set if geolocation denied
     userAgent: navigator.userAgent,
     language: navigator.language,
     platform: navigator.platform
@@ -57,7 +59,7 @@ async function chooseColor(color) {
     body: JSON.stringify({ color, visitorInfo })
   });
 
-  // 5️⃣ Safely parse JSON
+  // 5️⃣ Handle backend response
   const data = await res.json().catch(() => ({ color, location: "Unknown" }));
 
   document.getElementById("result").innerHTML =
@@ -66,12 +68,30 @@ async function chooseColor(color) {
 }
 
 async function submitInput(data) {
-  await fetch("/api/submit", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data)
-  });
+  try {
+    const res = await fetch("/api/submit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      // Backend returned an error
+      const errorData = await res.json();
+      throw new Error(errorData.error || "Failed to submit data");
+    }
+
+    const result = await res.json();
+    console.log("✅ Data submitted successfully:", result);
+    return result;
+
+  } catch (err) {
+    console.error("❌ Submit failed:", err);
+    // You can also show an alert or update UI here
+    throw err; // rethrow if you want calling code to handle it
+  }
 }
+
 
 // Expose globally for onclick handlers
 window.chooseColor = chooseColor;

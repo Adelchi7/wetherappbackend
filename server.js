@@ -11,6 +11,8 @@ app.use(express.json());
 app.get("/ping", (req, res) => res.sendStatus(200));
 
 // POST endpoint for color choice + location
+const { insertVisitorData } = require('./databaseCtrl'); // import DB function
+
 app.post("/api/choice", async (req, res) => {
   const { color, visitorInfo } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
@@ -20,18 +22,22 @@ app.post("/api/choice", async (req, res) => {
   }
 
   let location = "Unknown";
+  let coordinates = [0, 0]; // default coordinates if none available
+  let name = visitorInfo?.name || "Anonymous";
 
   try {
     // Prefer coordinates
     if (visitorInfo?.coords?.latitude && visitorInfo?.coords?.longitude) {
       const { latitude, longitude } = visitorInfo.coords;
+      coordinates = [longitude, latitude]; // MongoDB GeoJSON uses [lon, lat]
+
       const geoRes = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
         {
           headers: {
-            "User-Agent": "WetherAppBackend/1.0 (+https://yourdomain.com)",
-            "Accept-Language": "en"
-          }
+            "User-Agent": "VisitorAppBackend/1.0 (+https://yourdomain.com)",
+            "Accept-Language": "en",
+          },
         }
       );
       if (geoRes.ok) {
@@ -44,12 +50,21 @@ app.post("/api/choice", async (req, res) => {
         location = await geoRes.text();
       }
     }
-  } catch (err) {
-    console.error("Geo lookup failed:", err);
-  }
 
-  // Always return JSON
-  res.json({ color, location });
+    // Insert into MongoDB
+    const savedVisitor = await insertVisitorData({
+      name,
+      color,
+      location,
+      location: { type: "Point", coordinates },
+    });
+
+    // Return JSON response
+    res.json({ success: true, visitor: savedVisitor });
+  } catch (err) {
+    console.error("Error storing visitor data:", err);
+    res.status(500).json({ error: "Failed to store visitor data" });
+  }
 });
 
 // Serve frontend.html at /app
