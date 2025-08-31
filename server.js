@@ -74,6 +74,7 @@ app.post("/api/choice", async (req, res) => {
     console.log("MongoDB insert payload:", payloadToInsert);
 
     const savedVisitor = await insertVisitorData(payloadToInsert);
+    console.log("MongoDB saved document:", savedVisitor);
 
     res.json({
       success: true,
