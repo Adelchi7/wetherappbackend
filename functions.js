@@ -104,8 +104,8 @@ function patchLon(lon, lat, targetKm) {
 
 async function loadVisitorMap() {
   const res = await fetch("/api/visitors");
-  console.log('>>>>> '+res);
   const visitors = await res.json();
+  console.log('>>>>>>> visitors  '+visitors);
   const targetKm = 100;
 
   const map = L.map("visitorMap").setView([20, 0], 2);
