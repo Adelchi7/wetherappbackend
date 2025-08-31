@@ -124,6 +124,9 @@ async function loadVisitorMap() {
     return [snappedLat, snappedLon, 1];         // Leaflet: [lat, lon, intensity]
   });
 
+  console.log("Heat Points:", heatPoints);
+
+
   // --- add heatmap ---
   L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
 }
