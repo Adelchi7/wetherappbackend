@@ -65,12 +65,15 @@ app.post("/api/choice", async (req, res) => {
       }
     }
 
-    // Insert into MongoDB
-    const savedVisitor = await insertVisitorData({
+    // --- LOG THE OBJECT BEFORE INSERT ---
+    const payloadToInsert = {
       color,
-      city,                       // pass the human-readable city
+      city,
       location: { type: "Point", coordinates },
-    });
+    };
+    console.log("MongoDB insert payload:", payloadToInsert);
+
+    const savedVisitor = await insertVisitorData(payloadToInsert);
 
     res.json({
       success: true,
