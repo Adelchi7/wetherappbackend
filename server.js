@@ -21,9 +21,10 @@ app.post("/api/choice", async (req, res) => {
     return res.status(400).json({ error: "Invalid color" });
   }
 
-  let city = "Unknown";
   let coordinates = [0, 0]; // default
-  const name = visitorInfo?.name || "Anonymous";
+  if (visitorInfo?.coords?.latitude && visitorInfo?.coords?.longitude) {
+    coordinates = [visitorInfo.coords.longitude, visitorInfo.coords.latitude];
+  }
 
   try {
     // Connect to MongoDB once
@@ -66,7 +67,7 @@ app.post("/api/choice", async (req, res) => {
     // Insert into MongoDB
     const savedVisitor = await insertVisitorData({
       color,
-      city: location,                // string city for frontend
+      city,                       // pass the human-readable city
       location: { type: "Point", coordinates },
     });
 

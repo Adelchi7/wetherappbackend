@@ -4,14 +4,13 @@ const mongoose = require('mongoose');
 // Schema for visitor data
 const visitorSchema = new mongoose.Schema({
   color: { type: String, required: true },
-  city: { type: String, default: "Unknown" }, // optional, for frontend
+  city: { type: String, default: "Unknown" },   // <--- add this
   location: {
     type: { type: String, enum: ["Point"], required: true },
     coordinates: { type: [Number], required: true },
   },
   createdAt: { type: Date, default: Date.now },
 });
-
 
 // Model
 const Visitor = mongoose.model("Visitor", visitorSchema, "visitors");
