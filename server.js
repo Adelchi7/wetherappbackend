@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { insertVisitorData } = require('./databaseCtrl');// import DB function
+const fetch = require("node-fetch"); // make sure to install node-fetch
+const { insertVisitorData, connectDB } = require("./databaseCtrl");
+
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -20,33 +22,45 @@ app.post("/api/choice", async (req, res) => {
     return res.status(400).json({ error: "Invalid color" });
   }
 
-  let location = "Unknown";
-  let coordinates = [0, 0]; // default coordinates if none available
-  let name = visitorInfo?.name || "Anonymous";
+  let city = "Unknown";
+  let coordinates = [0, 0]; // default
+  const name = visitorInfo?.name || "Anonymous";
 
   try {
-    // Prefer coordinates
+    // Connect to MongoDB once
+    await connectDB();
+
+    // Determine coordinates and city
     if (visitorInfo?.coords?.latitude && visitorInfo?.coords?.longitude) {
       const { latitude, longitude } = visitorInfo.coords;
-      coordinates = [longitude, latitude]; // MongoDB GeoJSON uses [lon, lat]
+      coordinates = [longitude, latitude]; // GeoJSON format
 
-      const geoRes = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
-        {
-          headers: {
-            "User-Agent": "VisitorAppBackend/1.0 (+https://yourdomain.com)",
-            "Accept-Language": "en",
-          },
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`,
+          {
+            headers: {
+              "User-Agent": "VisitorAppBackend/1.0 (+https://yourdomain.com)",
+              "Accept-Language": "en",
+            },
+          }
+        );
+
+        if (geoRes.ok) {
+          const data = await geoRes.json();
+          city = data.address?.city || data.address?.town || data.address?.village || "Unknown";
         }
-      );
-      if (geoRes.ok) {
-        const data = await geoRes.json();
-        location = data.address?.city || data.address?.town || data.address?.village || "Unknown";
+      } catch (geoErr) {
+        console.warn("Reverse geocoding failed:", geoErr.message);
       }
     } else if (visitorInfo?.ip) {
-      const geoRes = await fetch(`https://ipapi.co/${visitorInfo.ip}/city/`);
-      if (geoRes.ok) {
-        location = await geoRes.text();
+      try {
+        const geoRes = await fetch(`https://ipapi.co/${visitorInfo.ip}/city/`);
+        if (geoRes.ok) {
+          city = await geoRes.text();
+        }
+      } catch (ipErr) {
+        console.warn("IP geolocation failed:", ipErr.message);
       }
     }
 
@@ -54,13 +68,13 @@ app.post("/api/choice", async (req, res) => {
     const savedVisitor = await insertVisitorData({
       name,
       color,
-      location: { type: "Point", coordinates },
+      city, // human-readable city
+      location: { type: "Point", coordinates }, // GeoJSON
     });
 
-    // Return JSON response
     res.json({ success: true, visitor: savedVisitor });
   } catch (err) {
-    console.error("Error storing visitor data:", err);
+    console.error("MongoDB insert error:", err.message, err.errors || err);
     res.status(500).json({ error: "Failed to store visitor data" });
   }
 });
@@ -76,6 +90,6 @@ app.get("/functions.js", (req, res) => {
 });
 
 // Start server
-app.listen(port, () => {
-  console.log(`Backend running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Backend running on port ${PORT}`);
 });
