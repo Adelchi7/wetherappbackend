@@ -1,5 +1,5 @@
 // functions.js
-
+import { patchLat, patchLon } from './coord.js';
 // Helper: get coordinates from browser
 async function getCoordinates() {
   return new Promise((resolve, reject) => {
@@ -95,6 +95,7 @@ async function submitInput(data) {
 async function loadVisitorMap() {
   const res = await fetch("/api/visitors");
   const visitors = await res.json();
+  const targetKm = 100;
 
   // Initialize map centered globally
   const map = L.map("visitorMap").setView([20, 0], 2);
@@ -104,8 +105,18 @@ async function loadVisitorMap() {
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 
+  const heatPoints = visitors.map(v => {
+    const [lon, lat] = v.location.coordinates;
+    const snappedLat = patchLat(lat, targetKm);
+    const snappedLon = patchLon(lon, lat, targetKm);
+    return [snappedLat, snappedLon, 1]; // intensity
+  });
+
+  L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(map);
+
+
   // Add pins
-  visitors.forEach(v => {
+/*   visitors.forEach(v => {
     const [lon, lat] = v.location.coordinates;
     L.circleMarker([lat, lon], {
       radius: 8,
@@ -116,7 +127,7 @@ async function loadVisitorMap() {
       fillOpacity: 0.8
     }).addTo(map)
       .bindPopup(`Color: ${v.color}`);
-  });
+  }); */
 }
 
 loadVisitorMap();

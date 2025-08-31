@@ -4,7 +4,7 @@
  * @param {number} targetKm - target patch size in km
  * @returns {number} snapped latitude
  */
-function patchLat(lat, targetKm) {
+export function patchLat(lat, targetKm) {
   const degLatSize = targetKm / 111; // degrees per patch
   return Math.round(lat / degLatSize) * degLatSize;
 }
@@ -16,7 +16,7 @@ function patchLat(lat, targetKm) {
  * @param {number} targetKm - target patch size in km
  * @returns {number} snapped longitude
  */
-function patchLon(lon, lat, targetKm) {
+export function patchLon(lon, lat, targetKm) {
   const degLonSize = targetKm / (111 * Math.cos(lat * Math.PI / 180)); // degrees per patch
   return Math.round(lon / degLonSize) * degLonSize;
 }
