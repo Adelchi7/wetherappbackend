@@ -53,7 +53,7 @@ async function chooseColor(color) {
   };
 
   // 4️⃣ Send to backend
-  const res = await fetch("https://wetherappbackend.onrender.com/api/choice", {
+  const res = await fetch("/api/choice", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ color, visitorInfo })
