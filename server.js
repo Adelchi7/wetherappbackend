@@ -13,8 +13,8 @@ app.use(express.json());
 app.get("/ping", (req, res) => res.sendStatus(200));
 
 // POST endpoint for color choice + location
-app.post("/api/choice", async (req, res) => {
-  console.log(req.body);
+app.post("/api/choice", async (req, res) => {  
+  console.log("VisitorInfo received:", req.body);
   const { color, visitorInfo } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
 
