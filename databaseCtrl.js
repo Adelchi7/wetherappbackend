@@ -2,8 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 
 // Schema for visitor data
-const visitorSchema = new mongoose.Schema({
-  name: { type: String, required: true },          // visitor name
+const visitorSchema = new mongoose.Schema({          // visitor name
   color: { type: String, required: true },         // status color
   location: {
     type: { type: String, enum: ["Point"], required: true },

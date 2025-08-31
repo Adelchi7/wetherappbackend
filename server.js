@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const { insertVisitorData } = require('./databaseCtrl');// import DB function
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -11,8 +12,6 @@ app.use(express.json());
 app.get("/ping", (req, res) => res.sendStatus(200));
 
 // POST endpoint for color choice + location
-const { insertVisitorData } = require('./databaseCtrl'); // import DB function
-
 app.post("/api/choice", async (req, res) => {
   const { color, visitorInfo } = req.body;
   const allowedColors = ["Red", "Green", "Blue"];
@@ -55,7 +54,6 @@ app.post("/api/choice", async (req, res) => {
     const savedVisitor = await insertVisitorData({
       name,
       color,
-      location,
       location: { type: "Point", coordinates },
     });
 
