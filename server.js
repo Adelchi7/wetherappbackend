@@ -65,10 +65,9 @@ app.post("/api/choice", async (req, res) => {
 
     // Insert into MongoDB
     const savedVisitor = await insertVisitorData({
-      name,
       color,
-      city, // human-readable city
-      location: { type: "Point", coordinates }, // GeoJSON
+      city: location,                // string city for frontend
+      location: { type: "Point", coordinates },
     });
 
     res.json({
