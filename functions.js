@@ -1,5 +1,5 @@
 // functions.js
-import { patchLat, patchLon } from './coord.js';
+
 // Helper: get coordinates from browser
 async function getCoordinates() {
   return new Promise((resolve, reject) => {
