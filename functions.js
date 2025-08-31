@@ -126,6 +126,16 @@ async function loadVisitorMap() {
 
   console.log("Heat Points:", heatPoints);
 
+  heatPoints.forEach(([lat, lon]) => {
+    L.circleMarker([lat, lon], {
+      radius: 6,
+      color: "red",
+      fillColor: "red",
+      fillOpacity: 0.8
+    }).addTo(map);
+  });
+
+
 
   // --- add heatmap ---
   L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
