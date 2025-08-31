@@ -42,6 +42,7 @@ async function getAllVisitorsData() {
 
 // Export everything needed
 module.exports = {
+  Visitor,
   connectDB,           // now available to server.js
   insertVisitorData,
   getAllVisitorsData,
