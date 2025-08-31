@@ -13,7 +13,7 @@ const visitorSchema = new mongoose.Schema({
 });
 
 // Model
-const Visitor = mongoose.model("Visitor", visitorSchema, "visitors");
+const Visitor = mongoose.model("Visitor", visitorSchema, "data");
 
 // MongoDB connection
 const mongoURI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_CLUSTER}/${process.env.MONGO_DB}?retryWrites=true&w=majority`;
