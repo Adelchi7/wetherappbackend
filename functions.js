@@ -92,42 +92,32 @@ async function submitInput(data) {
   }
 }
 
+function patchLat(lat, targetKm) {
+  const degLatSize = targetKm / 111;
+  return Math.round(lat / degLatSize) * degLatSize;
+}
+
+function patchLon(lon, lat, targetKm) {
+  const degLonSize = targetKm / (111 * Math.cos(lat * Math.PI / 180));
+  return Math.round(lon / degLonSize) * degLonSize;
+}
+
 async function loadVisitorMap() {
   const res = await fetch("/api/visitors");
   const visitors = await res.json();
   const targetKm = 100;
 
-  // Initialize map centered globally
   const map = L.map("visitorMap").setView([20, 0], 2);
-
-  // Add OpenStreetMap tiles
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 
   const heatPoints = visitors.map(v => {
     const [lon, lat] = v.location.coordinates;
-    const snappedLat = patchLat(lat, targetKm);
-    const snappedLon = patchLon(lon, lat, targetKm);
-    return [snappedLat, snappedLon, 1]; // intensity
+    return [patchLat(lat, targetKm), patchLon(lon, lat, targetKm), 1];
   });
 
   L.heatLayer(heatPoints, { radius: 25, blur: 15, maxZoom: 17 }).addTo(map);
-
-
-  // Add pins
-/*   visitors.forEach(v => {
-    const [lon, lat] = v.location.coordinates;
-    L.circleMarker([lat, lon], {
-      radius: 8,
-      fillColor: v.color.toLowerCase(),
-      color: "#000",
-      weight: 1,
-      opacity: 1,
-      fillOpacity: 0.8
-    }).addTo(map)
-      .bindPopup(`Color: ${v.color}`);
-  }); */
 }
 
 loadVisitorMap();
