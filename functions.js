@@ -110,54 +110,34 @@ async function loadVisitorMap() {
     return Math.round(lon / degLonSize) * degLonSize;
   }
 
-  // --- initialize map ---
+  // --- initialize map near data ---
   const map = L.map("visitorMap").setView([42.35, 13.4], 6); // L’Aquila
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 
-  // --- prepare patched points ---
+  // --- prepare heatmap points ---
   const heatPoints = visitors.map(v => {
-    const [lon, lat] = v.location.coordinates; // MongoDB: [lon, lat]
+    const [lon, lat] = v.location.coordinates;   // MongoDB: [lon, lat]
     const snappedLat = patchLat(lat, targetKm);
     const snappedLon = patchLon(lon, lat, targetKm);
-    return { lat: snappedLat, lon: snappedLon, color: v.color };
+    return [snappedLat, snappedLon, 1];         // Leaflet: [lat, lon, intensity]
   });
+
   console.log("Heat Points:", heatPoints);
 
   heatPoints.forEach(([lat, lon]) => {
     L.circleMarker([lat, lon], {
-      radius: 6, color: "red", fillColor: "red", fillOpacity: 0.8 
+      radius: 6,
+      color: "red",
+      fillColor: "red",
+      fillOpacity: 0.8
     }).addTo(map);
   });
 
-  // --- helper: draw fading dot ---
-  function drawFadingDot(ctx, x, y, radius, color) {
-    const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, color);                 // center
-    gradient.addColorStop(1, 'rgba(0,0,0,0)');       // edge transparent
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(x, y, radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // --- Canvas overlay layer ---
-  const canvasLayer = L.canvasLayer().delegate({
-    onDrawLayer: function(info) {
-      const ctx = info.canvas.getContext('2d');
-      patchedPoints.forEach(dot => {
-        const point = info.layer._map.latLngToContainerPoint([dot.lat, dot.lon]);
-        drawFadingDot(ctx, point.x, point.y, 15, dot.color.toLowerCase());
-      });
-    }
-  }).addTo(map);
-
-  // --- optional: add heatmap (still works with patched points) ---
+  // --- add heatmap ---
   L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
 }
-
 
 loadVisitorMap();
 
