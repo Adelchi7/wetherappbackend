@@ -126,7 +126,7 @@ async function loadVisitorMap() {
 
   console.log("Heat Points:", heatPoints);
 
-  heatPoints.forEach(([lat, lon], index) => {
+/*   heatPoints.forEach(([lat, lon], index) => {
     const color = visitors[index].color.toLowerCase(); // convert to lowercase for CSS
     const radii = [6, 12, 18];
     const opacities = [0.8, 0.5, 0.2];
@@ -139,7 +139,7 @@ async function loadVisitorMap() {
             weight: 0
         }).addTo(map);
     });
-  });
+  }); */
   // --- add heatmap ---
   L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
 }
