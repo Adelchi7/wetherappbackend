@@ -117,11 +117,18 @@ async function loadVisitorMap() {
   }).addTo(map);
 
   // --- prepare patched points ---
-  const patchedPoints = visitors.map(v => {
+  const heatPoints = visitors.map(v => {
     const [lon, lat] = v.location.coordinates; // MongoDB: [lon, lat]
     const snappedLat = patchLat(lat, targetKm);
     const snappedLon = patchLon(lon, lat, targetKm);
     return { lat: snappedLat, lon: snappedLon, color: v.color };
+  });
+  console.log("Heat Points:", heatPoints);
+
+  heatPoints.forEach(([lat, lon]) => {
+    L.circleMarker([lat, lon], {
+      radius: 6, color: "red", fillColor: "red", fillOpacity: 0.8 
+    }).addTo(map);
   });
 
   // --- helper: draw fading dot ---
@@ -148,9 +155,9 @@ async function loadVisitorMap() {
   }).addTo(map);
 
   // --- optional: add heatmap (still works with patched points) ---
-  const heatPoints = patchedPoints.map(p => [p.lat, p.lon, 1]);
   L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
 }
+
 
 loadVisitorMap();
 
