@@ -125,14 +125,24 @@ async function loadVisitorMap() {
   });
 
   console.log("Heat Points:", heatPoints);
+// --- Render fuzzy CSS dots ---
   heatPoints.forEach(([lat, lon], index) => {
-    const color = visitors[index].color.toLowerCase(); // convert to lowercase for CSS
-    L.circleMarker([lat, lon], {
-      radius: 6,
-      color: color,
-      fillColor: color,
-      fillOpacity: 0.8
+    const color = visitors[index].color.toLowerCase(); // color from JSON
+
+    const marker = L.circleMarker([lat, lon], {
+      radius: 12,           // bigger for cloud effect
+      color: color,         // stroke (border)
+      fillColor: color,     // fill
+      fillOpacity: 0.4,     // semi-transparent
+      weight: 0             // no border for soft edges
     }).addTo(map);
+
+    // Apply CSS for soft/fading/cloudy look
+    const el = marker.getElement();
+    if (el) {
+      el.style.filter = "blur(4px)";    // soft edges
+      el.style.opacity = "0.6";         // overall transparency
+    }
   });
   // --- add heatmap ---
   L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
