@@ -3,7 +3,7 @@
   <title>Color Picker</title>
   <style>
     .icon-img {
-      width: 5%;   /* 50% of parent container */
+      width: 25%;   /* 50% of parent container */
       height: auto;
     }
     body { font-family: sans-serif; text-align: center; margin-top: 50px; }
@@ -15,6 +15,13 @@
   <h1>Pick a Color</h1>
   <div id="colors">
     <button type="submit" onclick="chooseColor('Red')">Red</button>
+    <div class="image-container">
+      <img 
+        src="/seagull1.png" 
+        alt="Seagull" 
+        class="icon-img"
+      />
+    </div>
     <button type="submit" onclick="chooseColor('Green')">Green</button>
     <div class="image-container">
       <img 
