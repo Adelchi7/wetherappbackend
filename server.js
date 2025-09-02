@@ -9,6 +9,9 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+// Serve static files
+app.use(express.static(path.join(__dirname, "svg")));
+
 // Ping endpoint
 app.get("/ping", (req, res) => res.sendStatus(200));
 
