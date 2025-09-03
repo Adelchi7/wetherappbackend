@@ -83,32 +83,45 @@
   </style>
 </head>
 <body>
-  <h1>Pick a Color</h1>
+  <h1>How you feeling?</h1>
+  <h2>Pick one.</h2>
   <!-- HTML -->
   <div id="colors">
 
     <!-- Green -->
-    <div class="color-option">
-      <button type="submit" onclick="chooseColor('Green')">Green</button>
-      <div class="image-container bg-green">
-        <img src="/seagull1.png" alt="Volcano" class="icon-img" />
-      </div>
+<!-- Green -->
+  <div class="color-option">
+    <div class="image-container bg-green">
+      <img 
+        src="/seagull1.png" 
+        alt="Seagull" 
+        class="icon-img" 
+        onclick="chooseColor('Green')" 
+      />
     </div>
+  </div>
 
-    <!-- Red -->
-    <div class="color-option">
-      <button type="submit" onclick="chooseColor('Red')">Red</button>
-      <div class="image-container bg-red">
-        <img src="/volcano_nobg.png" alt="Seagull" class="icon-img" />
-      </div>
+  <!-- Red -->
+  <div class="color-option">
+    <div class="image-container bg-red">
+      <img 
+        src="/volcano_nobg.png" 
+        alt="Volcano" 
+        class="icon-img" 
+        onclick="chooseColor('Red')" 
+      />
     </div>
+  </div>
 
-    <!-- Blue -->
-    <div class="color-option">
-      <button type="submit" onclick="chooseColor('Blue')">Blue</button>
-      <div class="image-container bg-blue">
-        <img src="/drop.webp" alt="Volcano" class="icon-img" />
-      </div>
+  <!-- Blue -->
+  <div class="color-option">
+    <div class="image-container bg-blue">
+      <img 
+        src="/drop.webp" 
+        alt="Droplet" 
+        class="icon-img" 
+        onclick="chooseColor('Blue')" 
+      />
     </div>
   </div>
   
