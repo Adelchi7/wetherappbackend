@@ -118,8 +118,56 @@ app.get("/api/visitors", async (req, res) => {
 });
 
 app.post("/api/submit", async (req, res) => {
+  const {
+    emotion,
+    color,
+    emoji,
+    title,
+    answers,
+    coords,
+    ip,
+    userAgent,
+    language,
+    platform,
+    timestamp
+  } = req.body;
+
+  let coordinates = [0, 0];
+  if (coords?.latitude && coords?.longitude) {
+    coordinates = [coords.longitude, coords.latitude]; // GeoJSON format
+  }
+
+  try {
+    await connectDB();
+
+    // Insert everything
+    const payloadToInsert = {
+      emotion,
+      color,
+      emoji,
+      title,
+      answers,
+      ip,
+      userAgent,
+      language,
+      platform,
+      timestamp,
+      city: "Unknown", // optional: reverse geocode
+      location: { type: "Point", coordinates },
+    };
+
+    const saved = await insertVisitorData(payloadToInsert);
+    res.json({ success: true, id: saved._id });
+  } catch (err) {
+    console.error("Error saving quiz result:", err);
+    res.status(500).json({ error: "Failed to store quiz result" });
+  }
+});
+
+
+/* app.post("/api/submit", async (req, res) => {
   console.log("Quiz submit received:", req.body);
-  const { emotion, color, emoji, title, answers, coords, ip, userAgent, language, platform, timestamp } = req.body;
+  const { emotion, color, coords } = req.body;
 
   try {
     await connectDB();
@@ -131,25 +179,9 @@ app.post("/api/submit", async (req, res) => {
 
     const payloadToInsert = {
       color,
-      emotion,
-      emoji,
-      title,
-      answers,
-      coords,
-      ip,
-      userAgent,
-      language,
-      platform,
-      timestamp,
-      city: "Unknown", // or reverse geocode if you want
-      location: { type: "Point", coordinates },
-    };
-
-/*     const payloadToInsert = {
-      color,
       city: "Unknown",
       location: { type: "Point", coordinates },
-    }; */
+    };
 
     const saved = await insertVisitorData(payloadToInsert);
     res.json({ success: true, id: saved._id });
@@ -158,7 +190,7 @@ app.post("/api/submit", async (req, res) => {
     res.status(500).json({ error: "Failed to store quiz result" });
   }
 });
-
+ */
 
 
 // Serve frontend JS
