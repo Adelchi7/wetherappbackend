@@ -96,6 +96,15 @@ app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "wetherapp_picture_quiz.html"));
 });
 
+app.get("/wetherapp_picture_quiz.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "wetherapp_picture_quiz.js"));
+});
+
+app.get("/wetherapp_picture_quiz.css", (req, res) => {
+  res.sendFile(path.join(__dirname, "wetherapp_picture_quiz.css"));
+});
+
+
 // GET all visitor data
 app.get("/api/visitors", async (req, res) => {
   try {
