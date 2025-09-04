@@ -126,7 +126,72 @@ app.get("/api/visitors", async (req, res) => {
   }
 });
 
+// Helper: get client IP from request
+function getClientIP(req) {
+  return req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;
+}
+
 app.post("/api/submit", async (req, res) => {
+  const { emotion, color, emoji, title, answers, coords } = req.body;
+
+  let coordinates = [0, 0];
+  if (coords?.latitude && coords?.longitude) {
+    coordinates = [coords.longitude, coords.latitude]; // GeoJSON [lon, lat]
+  }
+
+  // Get IP
+  const ip = getClientIP(req);
+
+  // Determine city
+  let city = "Unknown";
+  if (coords?.latitude && coords?.longitude) {
+    try {
+      const geoRes = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${coords.latitude}&lon=${coords.longitude}`,
+        { headers: { "User-Agent": "wetherappBackend/1.0" } }
+      );
+      if (geoRes.ok) {
+        const geoData = await geoRes.json();
+        city = geoData.address?.city || geoData.address?.town || geoData.address?.village || "Unknown";
+      }
+    } catch (err) {
+      console.warn("Reverse geocoding failed:", err.message);
+    }
+  } else if (ip) {
+    try {
+      const ipRes = await fetch(`https://ipapi.co/${ip}/city/`);
+      if (ipRes.ok) city = await ipRes.text();
+    } catch (err) {
+      console.warn("IP geolocation failed:", err.message);
+    }
+  }
+
+  try {
+    await connectDB();
+
+    const payloadToInsert = {
+      emotion,
+      color,
+      emoji,
+      title,
+      answers,
+      coords,
+      ip,
+      city,
+      location: { type: "Point", coordinates },
+      createdAt: new Date(),
+    };
+
+    const saved = await insertVisitorData(payloadToInsert);
+    res.json({ success: true, id: saved._id, city, ip });
+  } catch (err) {
+    console.error("Error saving quiz result:", err);
+    res.status(500).json({ error: "Failed to store quiz result" });
+  }
+});
+
+
+/* app.post("/api/submit", async (req, res) => {
   const {
     emotion,
     color,
@@ -171,7 +236,7 @@ app.post("/api/submit", async (req, res) => {
     console.error("Error saving quiz result:", err);
     res.status(500).json({ error: "Failed to store quiz result" });
   }
-});
+}); */
 
 
 /* app.post("/api/submit", async (req, res) => {
