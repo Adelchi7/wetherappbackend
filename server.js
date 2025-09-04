@@ -2,8 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const { Visitor, insertVisitorData, connectDB } = require("./databaseCtrl");
-const { emotion, color, emoji, title, answers, coords, ip, userAgent, language, platform, timestamp } = req.body;
-
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -121,7 +119,7 @@ app.get("/api/visitors", async (req, res) => {
 
 app.post("/api/submit", async (req, res) => {
   console.log("Quiz submit received:", req.body);
-  const { emotion, color, coords } = req.body;
+  const { emotion, color, emoji, title, answers, coords, ip, userAgent, language, platform, timestamp } = req.body;
 
   try {
     await connectDB();
