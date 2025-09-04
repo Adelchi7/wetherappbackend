@@ -2,7 +2,7 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 
 // Schema for visitor data
-const visitorSchema = new mongoose.Schema({
+/* const visitorSchema = new mongoose.Schema({
   color: { type: String, required: true },
   city: { type: String, default: "Unknown" },
   location: {
@@ -10,7 +10,37 @@ const visitorSchema = new mongoose.Schema({
     coordinates: { type: [Number], required: true },
   },
   createdAt: { type: Date, default: Date.now },
+}); */
+
+const visitorSchema = new mongoose.Schema({
+  emotion: { type: String },
+  color: { type: String, required: true },
+  emoji: { type: String },
+  title: { type: String },
+  answers: [
+    {
+      questionId: String,
+      choice: String,
+      emotion: String
+    }
+  ],
+  coords: {
+    latitude: Number,
+    longitude: Number
+  },
+  ip: { type: String },
+  userAgent: { type: String },
+  language: { type: String },
+  platform: { type: String },
+  timestamp: { type: Date },
+  city: { type: String, default: "Unknown" },
+  location: {
+    type: { type: String, enum: ["Point"], required: true },
+    coordinates: { type: [Number], required: true }
+  },
+  createdAt: { type: Date, default: Date.now }
 });
+
 
 // Model
 const Visitor = mongoose.model("Visitor", visitorSchema, "data");
