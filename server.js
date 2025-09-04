@@ -5,8 +5,17 @@ const { Visitor, insertVisitorData, connectDB } = require("./databaseCtrl");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
 app.use(cors());
+
+const corsOptions = {
+  origin: "https://wetherappfrontend.onrender.com", // your frontend URL
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // preflight support
+
 app.use(express.json());
 
 // Serve static files
