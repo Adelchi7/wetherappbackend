@@ -93,7 +93,7 @@ app.post("/api/choice", async (req, res) => {
 
 // Serve frontend.html at /app
 app.get("/app", (req, res) => {
-  res.sendFile(path.join(__dirname, "wetherapp_picture_quiz.html"));
+  res.sendFile(path.join(__dirname, "frontend.html"));
 });
 
 // GET all visitor data
