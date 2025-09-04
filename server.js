@@ -2,6 +2,8 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const { Visitor, insertVisitorData, connectDB } = require("./databaseCtrl");
+const { emotion, color, emoji, title, answers, coords, ip, userAgent, language, platform, timestamp } = req.body;
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -131,9 +133,25 @@ app.post("/api/submit", async (req, res) => {
 
     const payloadToInsert = {
       color,
-      city: "Unknown",
+      emotion,
+      emoji,
+      title,
+      answers,
+      coords,
+      ip,
+      userAgent,
+      language,
+      platform,
+      timestamp,
+      city: "Unknown", // or reverse geocode if you want
       location: { type: "Point", coordinates },
     };
+
+/*     const payloadToInsert = {
+      color,
+      city: "Unknown",
+      location: { type: "Point", coordinates },
+    }; */
 
     const saved = await insertVisitorData(payloadToInsert);
     res.json({ success: true, id: saved._id });
