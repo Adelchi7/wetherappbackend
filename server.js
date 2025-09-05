@@ -20,14 +20,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "svg")));
 app.use(express.static(path.join(__dirname, "public")));
 
-
 // Ping endpoint
 app.get("/ping", (req, res) => res.sendStatus(200));
-
-// Serve worldMap.html explicitly
-app.get("/worldMap.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "worldMap.html"));
-});
 
 // POST endpoint for color choice + location
 app.post("/api/choice", async (req, res) => {  
