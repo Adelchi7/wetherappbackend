@@ -29,12 +29,12 @@ async function loadWorldMap() {
     const [lon, lat] = v.location.coordinates; // MongoDB: [lon, lat]
     const snappedLat = patchLat(lat, targetKm);
     const snappedLon = patchLon(lon, lat, targetKm);
-    return [snappedLat, snappedLon, 1];
+    return [snappedLat, snappedLon, 1]; // always [lat, lon, intensity]
   });
 
   // --- render fuzzy dots ---
   heatPoints.forEach(([lat, lon], index) => {
-    const color = visitors[index].color.toLowerCase();
+    const color = (visitors[index].color || "#999").toLowerCase();
 
     const marker = L.circleMarker([lat, lon], {
       radius: 12,
@@ -48,6 +48,7 @@ async function loadWorldMap() {
     if (el) {
       el.style.filter = "blur(4px)";
       el.style.opacity = "0.6";
+      el.style.transformOrigin = "center center"; // keep pulse centered
     }
 
     // --- highlight the newest visitor ---
@@ -79,4 +80,3 @@ async function loadWorldMap() {
 }
 
 loadWorldMap();
-
