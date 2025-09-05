@@ -2,9 +2,9 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const { Visitor, insertVisitorData, connectDB } = require("./databaseCtrl");
-
-const app = express();
 const PORT = process.env.PORT || 3000;
+const app = express();
+app.options("*", cors(corsOptions));
 app.use(cors());
 
 const corsOptions = {
@@ -12,10 +12,9 @@ const corsOptions = {
   methods: ["GET", "POST", "OPTIONS"],
   allowedHeaders: ["Content-Type"],
 };
+// preflight support
 
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // preflight support
-
+app.use(cors(corsOptions)); 
 app.use(express.json());
 
 // Serve static files
