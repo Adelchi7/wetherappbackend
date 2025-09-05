@@ -24,6 +24,10 @@ app.use(express.static(path.join(__dirname, "public")));
 // Ping endpoint
 app.get("/ping", (req, res) => res.sendStatus(200));
 
+app.get("/worldMap.html", (req, res) => {
+  res.sendFile(path.join(__dirname, 'worldMap.html'));
+});
+
 // POST endpoint for color choice + location
 app.post("/api/choice", async (req, res) => {  
   console.log("VisitorInfo received:", req.body);
@@ -191,11 +195,6 @@ app.post("/api/submit", async (req, res) => {
     res.status(500).json({ error: "Failed to store quiz result" });
   }
 });
-
-app.get("/worldMap.html", (req, res) => {
-  res.sendFile(path.join(__dirname, "worldMap.html"));
-});
-
 
 /* app.post("/api/submit", async (req, res) => {
   const {
