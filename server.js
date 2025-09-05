@@ -192,6 +192,10 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
+app.get("/worldMap.html", (req, res) => {
+  res.sendFile(path.join(__dirname, "worldMap.html"));
+});
+
 
 /* app.post("/api/submit", async (req, res) => {
   const {
