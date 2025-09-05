@@ -4,7 +4,6 @@ const path = require("path");
 const { Visitor, insertVisitorData, connectDB } = require("./databaseCtrl");
 const PORT = process.env.PORT || 3000;
 const app = express();
-app.use(cors());
 
 const corsOptions = {
   origin: "https://wetherappfrontend.onrender.com", // your frontend URL
