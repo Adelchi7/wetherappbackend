@@ -32,7 +32,7 @@ const assets = {
   },
   sad: {
     q1:{img:svg('🌧️','#2196F3'),label:'Rain falling'},
-    q2:{img:svg('🪵','#2196F3'),label:'Sitting still'},
+    q2:{img:svg('🧘🏼','#2196F3'),label:'Sitting still'},
     q3:{img:svg('🎻','#2196F3'),label:'Lone cello'},
     q4:{img:svg('🌳','#2196F3'),label:'Weeping willow'},
     q5:{img:svg('💧','#2196F3'),label:'Drooping teardrop'},
