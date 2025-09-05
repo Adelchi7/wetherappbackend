@@ -118,7 +118,9 @@ app.get("/wetherapp_picture_quiz.css", (req, res) => {
 app.get("/api/visitors", async (req, res) => {
   try {
     await connectDB();
-    const visitors = await Visitor.find({}, { color: 1, location: 1, _id: 0 }); // adjust based on your schema
+    const visitors = await Visitor.find({}, { color: 1, location: 1, emotion: 1, _id: 0 }).sort({ createdAt: 1 }); // ascending → last one is newest
+
+    /* const visitors = await Visitor.find({}, { color: 1, location: 1, _id: 0 });  */// adjust based on your schema
     res.json(visitors);
   } catch (err) {
     console.error("Error fetching visitors:", err);
