@@ -19,6 +19,8 @@ app.use(express.json());
 // Serve static files
 app.use(express.static(path.join(__dirname, "svg")));
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/globalChart', express.static(path.join(__dirname, 'globalChart')));
+
 
 // Ping endpoint
 app.get("/ping", (req, res) => res.sendStatus(200));
