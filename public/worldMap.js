@@ -24,6 +24,17 @@ async function loadWorldMap() {
     attribution: "© OpenStreetMap contributors",
   }).addTo(map);
 
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const { latitude, longitude } = pos.coords;
+      map.setView([latitude, longitude], 10); // local zoom
+    },
+    (err) => {
+      console.warn("Geolocation denied or failed:", err.message);
+      // stays on default world view
+    }
+  );
+
   // --- prepare heatmap points ---
   const heatPoints = visitors.map(v => {
     const [lon, lat] = v.location.coordinates; // MongoDB: [lon, lat]
