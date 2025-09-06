@@ -27,6 +27,23 @@
       50%  { transform: scale(1.4); opacity: 0.6; }
       100% { transform: scale(1); opacity: 1; }
     }
+    .chart-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      text-decoration: none;
+      color: #333;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      transition: background 0.2s;
+    }
+    .chart-btn:hover {
+      background: #f0f0f0;
+    }
   </style>
 </head>
 <body>
@@ -36,6 +53,8 @@
   <!-- Leaflet + Heatmap -->
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+  <a href="globalChart/globalChartComponent.html" class="chart-btn">📊 View Charts</a>
 
   <!-- World Map JS -->
   <script src="worldMap.js"></script>

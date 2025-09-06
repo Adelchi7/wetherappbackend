@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Global Emotion Chart Component</title>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- Component styles -->
+  <link rel="stylesheet" href="globalChartComponent.css" />
+</head>
+<body>
+
+  <!-- Chart containers -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;padding:18px;">
+    <!-- Example 1: programmatic init -->
+    <div id="chart1-container"></div>
+
+    <!-- Example 2: data attribute init -->
+    <div id="chart2-container" 
+      data-emotions='{"labels":["Hopeful","Angry","Sad","Neutral","Anxious"],"values":[280,170,220,200,130]}'>
+    </div>
+  </div>
+
+  <!-- Template -->
+  <template id="global-chart-template">
+    <div class="gc-card" role="region" aria-label="Global emotion chart">
+      <div class="gc-header">
+        <div>
+          <div class="gc-title">Global emotions</div>
+          <div class="gc-subtitle">Distribution across all areas</div>
+        </div>
+        <button class="gc-btn gc-export-btn" title="Export chart as PNG">Export PNG</button>
+      </div>
+
+      <div class="gc-chart-wrap">
+        <canvas class="gc-canvas"></canvas>
+        <div class="gc-toplabel"><div class="large">—</div><div class="small">top emotion</div></div>
+      </div>
+
+      <div class="gc-legend"></div>
+    </div>
+  </template>
+
+  <!-- Component logic -->
+  <script src="globalChartComponent.js"></script>
+
+  <!-- Example usage -->
+  <script>
+    // Example 1: programmatic
+    const c1 = createGlobalChart(document.getElementById('chart1-container'), {
+      labels: ['Hopeful','Angry','Sad','Neutral','Anxious'],
+      values: [28,17,22,20,13]
+    }, { filename: 'global-emotions-1' });
+
+    // Example 2: from DOM data attribute
+    const c2 = initGlobalChartFromDOM('#chart2-container');
+  </script>
+</body>
+</html>

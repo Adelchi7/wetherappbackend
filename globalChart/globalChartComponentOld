@@ -1,0 +1,364 @@
+/* 
+Global Chart Component
+Single-file HTML component that renders a responsive "Global Emotion" pie/donut chart
+that is easy to drop into a dashboard full of many charts.
+
+Features:
+- Chart.js (CDN) donut chart using your Wetherapp palette
+- Responsive (fills parent) and looks good inside grid containers
+- Accepts data via a JS init function or via data attributes
+- Legend with icons and percentages
+- Center label showing top emotion and percent
+- Small "Export PNG" button
+- Accessible (aria labels)
+
+Usage examples are at the bottom of this file. */
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Global Emotion Chart Component</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    /* Minimal, modern card styles suitable for a dashboard */
+    .gc-card {
+      box-shadow: 0 6px 18px rgba(20,20,40,0.06);
+      border-radius: 12px;
+      padding: 14px;
+      background: linear-gradient(180deg, #ffffff, #fbfcff);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      color: #111827;
+      min-width: 220px;
+      min-height: 220px;
+    }
+
+    .gc-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+
+    .gc-title {
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .gc-subtitle {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .gc-chart-wrap {
+      position: relative;
+      width: 100%;
+      flex: 1 1 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* Make canvas scale to its container */
+    .gc-canvas {
+      width: 100% !important;
+      height: auto !important;
+      max-width: 420px;
+      max-height: 360px;
+    }
+
+    .gc-legend {
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      font-size:13px;
+      margin-top:6px;
+    }
+
+    .gc-legend-row {
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .gc-swatch {
+      width:14px;
+      height:14px;
+      border-radius:3px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.06) inset;
+      flex-shrink:0;
+    }
+
+    .gc-legend-label {
+      min-width: 80px;
+    }
+
+    .gc-toplabel {
+      position: absolute;
+      text-align:center;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      left: 50%;
+      top: 50%;
+      font-weight:700;
+    }
+
+    .gc-toplabel .large { font-size:16px; }
+    .gc-toplabel .small { font-size:12px; color:#6b7280; }
+
+    .gc-footer {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .gc-btn {
+      background:transparent;
+      border:1px solid #e6e9ef;
+      padding:6px 8px;
+      border-radius:8px;
+      font-size:13px;
+      cursor:pointer;
+    }
+
+    .gc-btn:active { transform: translateY(1px); }
+
+    /* Small-screen friendly */
+    @media (max-width:420px){
+      .gc-card{ padding:10px; }
+      .gc-title{ font-size:13px; }
+    }
+  </style>
+</head>
+<body>
+
+<!--
+Component markup (you can duplicate this card inside a grid). The chart will be
+initialized through `createGlobalChart()` below. You can also provide a
+`data-emotions` JSON attribute (see usage examples) and call initFromDOM().
+-->
+
+<template id="global-chart-template">
+  <div class="gc-card" role="region" aria-label="Global emotion chart">
+    <div class="gc-header">
+      <div>
+        <div class="gc-title">Global emotions</div>
+        <div class="gc-subtitle">Distribution across all areas</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="gc-btn gc-export-btn" title="Export chart as PNG">Export PNG</button>
+      </div>
+    </div>
+
+    <div class="gc-chart-wrap">
+      <canvas class="gc-canvas" role="img" aria-label="Emotion distribution chart"></canvas>
+      <div class="gc-toplabel" aria-hidden="true"><div class="large">—</div><div class="small">top emotion</div></div>
+    </div>
+
+    <div class="gc-legend" aria-hidden="true"></div>
+  </div>
+</template>
+
+<script>
+/**
+ * Wetherapp palette (Final 5-emotion schema)
+ * - Hopeful: #4CAF50
+ * - Angry: #F44336
+ * - Sad: #2196F3
+ * - Neutral: #9E9E9E
+ * - Anxious: #FFC107
+ */
+const WETHER_PALETTE = {
+  'Hopeful': '#4CAF50',
+  'Angry': '#F44336',
+  'Sad': '#2196F3',
+  'Neutral': '#9E9E9E',
+  'Anxious': '#FFC107'
+};
+
+/** Helper - create the component and return API */
+function createGlobalChart(container, data, opts = {}){
+  // container: DOM element where the component will be mounted
+  // data: { labels: ['Hopeful','Angry',...'], values: [10,20,...] }
+
+  const tpl = document.getElementById('global-chart-template');
+  const node = tpl.content.cloneNode(true);
+  container.appendChild(node);
+  const card = container.querySelector('.gc-card:last-child');
+  const canvas = card.querySelector('canvas');
+  const legendEl = card.querySelector('.gc-legend');
+  const toplabel = card.querySelector('.gc-toplabel');
+  const exportBtn = card.querySelector('.gc-export-btn');
+
+  // Normalize labels to match palette keys (best-effort)
+  const labels = data.labels.map(l => {
+    const cleaned = String(l).trim();
+    // allow emoji or short keys - map to canonical words if needed
+    const mapping = {
+      '🌱 Hopeful':'Hopeful','Hopeful':'Hopeful','hopeful':'Hopeful',
+      '🔥 Angry':'Angry','Angry':'Angry','angry':'Angry',
+      '💧 Sad':'Sad','Sad':'Sad','sad':'Sad',
+      '⚪ Neutral':'Neutral','Neutral':'Neutral','neutral':'Neutral',
+      '⚡ Anxious':'Anxious','Anxious':'Anxious','anxious':'Anxious'
+    };
+    return mapping[cleaned] || cleaned;
+  });
+
+  const colors = labels.map(l => WETHER_PALETTE[l] || '#cccccc');
+
+  const total = data.values.reduce((a,b)=>a+(Number(b)||0),0);
+
+  // Chart.js donut
+  const chart = new Chart(canvas, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: data.values,
+        backgroundColor: colors,
+        borderWidth: 0,
+      }]
+    },
+    options: {
+      maintainAspectRatio: false,
+      cutout: '60%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: (ctx) => {
+              const v = ctx.raw || 0;
+              const pct = total ? (v/total*100).toFixed(1) + '%' : '0%';
+              return `${ctx.label}: ${v} (${pct})`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // Build legend rows
+  legendEl.innerHTML = '';
+  labels.forEach((label, i) => {
+    const value = data.values[i] || 0;
+    const pct = total ? ((value/total)*100).toFixed(1) : '0.0';
+    const row = document.createElement('div');
+    row.className = 'gc-legend-row';
+    row.innerHTML = `
+      <div class="gc-swatch" style="background:${colors[i]};"></div>
+      <div class="gc-legend-label">${label}</div>
+      <div style="margin-left:auto;font-weight:600">${value} <span style="color:#6b7280;font-weight:500">(${pct}%)</span></div>
+    `;
+    legendEl.appendChild(row);
+  });
+
+  // Top label (largest slice)
+  let topIdx = -1; let topVal = -Infinity;
+  data.values.forEach((v, i) => { if (Number(v) > topVal){ topVal = Number(v); topIdx = i; } });
+  if (topIdx >= 0 && total > 0){
+    toplabel.querySelector('.large').textContent = `${labels[topIdx]} — ${Math.round((topVal/total)*100)}%`;
+    toplabel.querySelector('.small').textContent = 'dominant emotion';
+  } else {
+    toplabel.querySelector('.large').textContent = `No data`;
+    toplabel.querySelector('.small').textContent = '';
+  }
+
+  // Export PNG
+  exportBtn.addEventListener('click', ()=>{
+    const url = chart.toBase64Image();
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (opts.filename || 'global-emotion-chart') + '.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
+
+  // Public API
+  return {
+    chart,
+    update(newData){
+      chart.data.labels = newData.labels;
+      chart.data.datasets[0].data = newData.values;
+      chart.data.datasets[0].backgroundColor = newData.labels.map(l => WETHER_PALETTE[l] || '#cccccc');
+      chart.update();
+      // refresh legend and toplabel (simple approach: re-call createGlobalChart's inner logic)
+      const total2 = newData.values.reduce((a,b)=>a+(Number(b)||0),0);
+      legendEl.innerHTML = '';
+      newData.labels.forEach((label, i) => {
+        const value = newData.values[i] || 0;
+        const pct = total2 ? ((value/total2)*100).toFixed(1) : '0.0';
+        const row = document.createElement('div');
+        row.className = 'gc-legend-row';
+        row.innerHTML = `
+          <div class="gc-swatch" style="background:${WETHER_PALETTE[label] || '#cccccc'};"></div>
+          <div class="gc-legend-label">${label}</div>
+          <div style="margin-left:auto;font-weight:600">${value} <span style="color:#6b7280;font-weight:500">(${pct}%)</span></div>
+        `;
+        legendEl.appendChild(row);
+      });
+      let topIdx2 = -1; let topVal2 = -Infinity;
+      newData.values.forEach((v, i) => { if (Number(v) > topVal2){ topVal2 = Number(v); topIdx2 = i; } });
+      if (topIdx2 >= 0 && total2>0){
+        toplabel.querySelector('.large').textContent = `${newData.labels[topIdx2]} — ${Math.round((topVal2/total2)*100)}%`;
+      } else {
+        toplabel.querySelector('.large').textContent = `No data`;
+        toplabel.querySelector('.small').textContent = '';
+      }
+    },
+    destroy(){ chart.destroy(); container.removeChild(card); }
+  };
+}
+
+/** Convenience: initialize component from an element with data-emotions attr */
+function initGlobalChartFromDOM(containerSelector){
+  const wrapper = document.querySelector(containerSelector);
+  if (!wrapper) throw new Error('Container not found: ' + containerSelector);
+  const dataAttr = wrapper.getAttribute('data-emotions');
+  if (!dataAttr) throw new Error('data-emotions attribute missing on container');
+  let parsed;
+  try { parsed = JSON.parse(dataAttr); } catch(e){ throw new Error('Invalid JSON in data-emotions attribute: ' + e.message); }
+  return createGlobalChart(wrapper, parsed || {labels:[], values:[]});
+}
+
+</script>
+
+<!-- ===================== USAGE EXAMPLES ===================== -->
+
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;padding:18px;">
+  <!-- Example 1: instantiate via JS with example percentages -->
+  <div id="chart1-container"></div>
+
+  <!-- Example 2: instantiate via DOM data attribute (stringified JSON) -->
+  <div id="chart2-container" data-emotions='{"labels":["Hopeful","Angry","Sad","Neutral","Anxious"],"values":[280,170,220,200,130]}'></div>
+</div>
+
+<script>
+  // Example usage: create chart 1 programmatically
+  const c1 = createGlobalChart(document.getElementById('chart1-container'), {
+    labels: ['Hopeful','Angry','Sad','Neutral','Anxious'],
+    values: [28,17,22,20,13]
+  }, { filename: 'global-emotions-1' });
+
+  // Example usage: init chart 2 from DOM attribute
+  const c2 = (function(){
+    const el = document.getElementById('chart2-container');
+    // the init function expects the container to already have the data-emotions attr
+    return (function(){
+      try { return initGlobalChartFromDOM('#chart2-container'); }
+      catch(e){ console.warn(e); return null; }
+    })();
+  })();
+
+  // You can later update charts like:
+  // c1.update({ labels:['Hopeful','Angry',...], values:[...] });
+</script>
+
+</body>
+</html>
