@@ -64,24 +64,31 @@ async function loadWorldMap() {
 
     // --- highlight the newest visitor ---
     if (index === visitors.length - 1) {
-      marker.setStyle({
+      const marker = L.circleMarker([lat, lon], {
         radius: 18,
+        color: "#FFD700",
+        fillColor: "#FFD700",
         fillOpacity: 0.9,
-        weight: 2,
-        color: "#FFD700" // golden border
-      });
+        weight: 2
+      }).addTo(map);
 
-      if (el) {
-        el.style.filter = "blur(2px) drop-shadow(0 0 8px #FFD700)";
-        el.style.opacity = "1";
-        el.classList.add("pulse-dot");
-      }
+      let growing = true;
+      setInterval(() => {
+        let r = marker.getRadius();
+        if (growing) {
+          r += 0.5;
+          if (r >= 22) growing = false;
+        } else {
+          r -= 0.5;
+          if (r <= 18) growing = true;
+        }
+        marker.setRadius(r);
+      }, 50);
 
       marker.bindPopup(
         `<b>New visitor!</b><br/>Emotion: ${visitors[index].emotion || "Unknown"}`
       ).openPopup();
 
-      // optional: auto-pan to latest visitor
       map.panTo([lat, lon]);
     }
   });
