@@ -27,7 +27,7 @@ async function loadWorldMap() {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const { latitude, longitude } = pos.coords;
-      map.setView([latitude, longitude], 7); // country-level zoom
+      map.setView([latitude, longitude], 7); // local zoom
     },
     (err) => {
       console.warn("Geolocation denied or failed:", err.message);
@@ -47,27 +47,6 @@ async function loadWorldMap() {
   heatPoints.forEach(([lat, lon], index) => {
     const color = (visitors[index].color || "#999").toLowerCase();
 
-    // --- newest visitor ---
-    if (index === visitors.length - 1) {
-      // --- create pulse icon marker ---
-      const pulsingIcon = L.icon.pulse({
-        iconSize: [20, 20],
-        color: "#FFD700",
-        fillColor: "#FFD700",
-        heartbeat: 1.5
-      });
-
-      const marker = L.marker([lat, lon], { icon: pulsingIcon }).addTo(map);
-
-      marker.bindPopup(
-        `<b>New visitor!</b><br/>Emotion: ${visitors[index].emotion || "Unknown"}`
-      ).openPopup();
-
-      map.panTo([lat, lon]);
-      return; // skip the normal circleMarker for newest visitor
-    }
-
-    // --- regular blurred circleMarkers ---
     const marker = L.circleMarker([lat, lon], {
       radius: 12,
       color: color,
@@ -80,6 +59,30 @@ async function loadWorldMap() {
     if (el) {
       el.style.filter = "blur(4px)";
       el.style.opacity = "0.6";
+      el.style.transformOrigin = "center center"; // keep pulse centered
+    }
+
+    // --- highlight the newest visitor ---
+    if (index === visitors.length - 1) {
+      marker.setStyle({
+        radius: 18,
+        fillOpacity: 0.9,
+        weight: 2,
+        color: "#FFD700" // golden border
+      });
+
+      if (el) {
+        el.style.filter = "blur(2px) drop-shadow(0 0 8px #FFD700)";
+        el.style.opacity = "1";
+        el.classList.add("pulse-dot");
+      }
+
+      marker.bindPopup(
+        `<b>New visitor!</b><br/>Emotion: ${visitors[index].emotion || "Unknown"}`
+      ).openPopup();
+
+      // optional: auto-pan to latest visitor
+      map.panTo([lat, lon]);
     }
   });
 
