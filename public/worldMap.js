@@ -68,7 +68,7 @@ async function loadWorldMap() {
         radius: 18,
         color: "#FFD700",
         fillColor: "#FFD700",
-        fillOpacity: 0.9,
+        fillOpacity: 0,
         weight: 2
       }).addTo(map);
 
