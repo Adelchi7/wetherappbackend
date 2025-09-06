@@ -27,7 +27,7 @@ async function loadWorldMap() {
   navigator.geolocation.getCurrentPosition(
     (pos) => {
       const { latitude, longitude } = pos.coords;
-      map.setView([latitude, longitude], 10); // local zoom
+      map.setView([latitude, longitude], 7); // local zoom
     },
     (err) => {
       console.warn("Geolocation denied or failed:", err.message);
