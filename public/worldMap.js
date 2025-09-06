@@ -86,7 +86,7 @@ async function loadWorldMap() {
       }, 50);
 
       marker.bindPopup(
-        `<b>Last visitor mark.</b><br/>: ${visitors[index].emotion || "Unknown"}`
+        `<b>Last visitor mark.</b><br/> ${(visitors[index].emotion || "Unknown").toUpperCase()}`
       ).openPopup();
 
       map.panTo([lat, lon]);
