@@ -86,7 +86,7 @@ async function loadWorldMap() {
       }, 50);
 
       marker.bindPopup(
-        `<b>New visitor!</b><br/>Emotion: ${visitors[index].emotion || "Unknown"}`
+        `<b>You seem</b><br/>: ${visitors[index].emotion || "Unknown"}`
       ).openPopup();
 
       map.panTo([lat, lon]);
