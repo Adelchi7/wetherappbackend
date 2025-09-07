@@ -254,6 +254,8 @@ storeBtn.addEventListener('click', async () => {
   try {
     // Decide which API to call
     const apiRoute = currentVisitorId ? "/api/update" : "/api/submit";
+    console.log("API Route:", apiRoute, "Payload:", payload);
+
 
     const res = await fetch(apiRoute, {
       method: "POST",

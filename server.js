@@ -199,27 +199,31 @@ app.post("/api/submit", async (req, res) => {
 });
 
 app.post('/api/update', async (req, res) => {
-  const { visitorId, emotions, quizData, ...rest } = req.body;
+  const { visitorId, ...data } = req.body;
 
   if (!visitorId) {
     return res.status(400).json({ error: 'visitorId is required for update' });
   }
 
   try {
-    // Use your saveVisitorData function: visitorId exists → append to history
-    const savedVisitor = await saveVisitorData(visitorId, {
-      emotions,
-      quizData,
-      ...rest
-    });
+    await connectDB();
 
-    res.json(savedVisitor); // return full visitor object (or just _id if preferred)
+    const updated = await Visitor.findByIdAndUpdate(
+      visitorId,
+      { $set: { ...data, updatedAt: new Date() } },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ error: 'Visitor not found' });
+    }
+
+    res.json({ success: true, id: updated._id });
   } catch (err) {
-    console.error('Error updating visitor:', err);
+    console.error("Error updating visitor:", err);
     res.status(500).json({ error: err.message });
   }
 });
-
 
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
