@@ -266,7 +266,7 @@ storeBtn.addEventListener('click', async () => {
 
     // Store _id in localStorage if this was a new visitor
     if (!currentVisitorId) {
-      localStorage.setItem('visitorId', data._id);
+      localStorage.setItem('visitorId', data.id);
     }
 
     finalBadge.textContent = "Saved! 🎉";
