@@ -198,6 +198,29 @@ app.post("/api/submit", async (req, res) => {
   }
 });
 
+app.post('/api/update', async (req, res) => {
+  const { visitorId, emotions, quizData, ...rest } = req.body;
+
+  if (!visitorId) {
+    return res.status(400).json({ error: 'visitorId is required for update' });
+  }
+
+  try {
+    // Use your saveVisitorData function: visitorId exists → append to history
+    const savedVisitor = await saveVisitorData(visitorId, {
+      emotions,
+      quizData,
+      ...rest
+    });
+
+    res.json(savedVisitor); // return full visitor object (or just _id if preferred)
+  } catch (err) {
+    console.error('Error updating visitor:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
   res.sendFile(path.join(__dirname, "functions.js"));

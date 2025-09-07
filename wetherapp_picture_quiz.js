@@ -232,6 +232,53 @@ async function getVisitorInfo() {
 }
 
 storeBtn.addEventListener('click', async () => {
+  let currentVisitorId = localStorage.getItem('visitorId');
+  finalBadge.textContent = "Saving…";
+
+  const final = computeResult();
+  const set = assets[final];
+  const visitorInfo = await getVisitorInfo();
+
+  const payload = {
+    visitorId: currentVisitorId,
+    emotion: final,
+    color: set.color,
+    emoji: set.emoji,
+    title: set.title,
+    answers: answers.map((em,i)=>({questionId: questions[i].id, choice: em, emotion: em})),
+    ...visitorInfo
+  };
+
+  console.log("Payload:", payload);
+
+  try {
+    // Decide which API to call
+    const apiRoute = currentVisitorId ? "/api/update" : "/api/submit";
+
+    const res = await fetch(apiRoute, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    console.log("✅ Stored successfully:", data);
+
+    // Store _id in localStorage if this was a new visitor
+    if (!currentVisitorId) {
+      localStorage.setItem('visitorId', data._id);
+    }
+
+    finalBadge.textContent = "Saved! 🎉";
+
+  } catch (err) {
+    console.error(err);
+    finalBadge.textContent = "Failed to save 😞";
+  }
+});
+
+
+/* storeBtn.addEventListener('click', async () => {
   finalBadge.textContent = "Saving…";
   const final = computeResult();
   const set = assets[final];
@@ -262,7 +309,7 @@ storeBtn.addEventListener('click', async () => {
       finalBadge.textContent = "Failed to save 😞";
     }
   })();
-});
+}); */
 
 
 
