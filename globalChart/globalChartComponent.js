@@ -158,8 +158,14 @@ function initGlobalChartFromDOM(selector){
 
 // Fetch visitor data for a given event
 async function fetchVisitorsForEvent(start,end){
-  const res = await fetch(`/api/visitors?start=${start}&end=${end}`);
-  return await res.json();
+  try {
+    const res = await fetch(`/api/visitors?start=${start}&end=${end}`);
+    if(!res.ok) throw new Error('Failed to fetch');
+    return await res.json();
+  } catch(e){
+    console.error('Error fetching visitors:', e);
+    return [];
+  }
 }
 
 // Aggregate visitors by day
@@ -176,12 +182,20 @@ function aggregateVisitorsByDay(visitors){
 
 // Create historical chart
 async function createHistoricalEventChart(container){
-  const eventData = JSON.parse(container.dataset.event);
-  const visitors = await fetchVisitorsForEvent(eventData.start,eventData.end);
-  const {labels,values} = aggregateVisitorsByDay(visitors);
-
-  return createGlobalChart(container,{labels,values},{event:eventData,filename:`${eventData.title}-chart`});
+  try {
+    const eventData = JSON.parse(container.dataset.event);
+    const visitors = await fetchVisitorsForEvent(eventData.start,eventData.end);
+    const {labels,values} = aggregateVisitorsByDay(visitors);
+    createGlobalChart(container,{labels,values},{event:eventData,filename:`${eventData.title}-chart`});
+  } catch(e){
+    console.error('Error creating historical chart:', e);
+  }
 }
 
-// Initialize historical charts
-document.querySelectorAll('#chart3-container').forEach(c=>createHistoricalEventChart(c));
+// Initialize all historical charts
+(async ()=>{
+  const containers = document.querySelectorAll('[data-event]');
+  for(const c of containers){
+    await createHistoricalEventChart(c);
+  }
+})();
