@@ -46,18 +46,6 @@ function createGlobalChart(container, data, opts = {}) {
             }
           },
           annotation: {
-            annotations: opts.event ? {
-              [opts.event.title]: {
-                type: 'box',
-                xMin: labels[0],
-                xMax: labels[labels.length - 1],
-                backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                label: { content: opts.event.title || '', enabled: true }
-              }
-            } : {}
-          }
-
-/*           annotation: {
             annotations: opts.event ? [{
               type: 'box',
               xMin: labels[0],
@@ -66,7 +54,7 @@ function createGlobalChart(container, data, opts = {}) {
               label: { content: opts.event.title || '', enabled: true }
             }] : []
           }
-        }, */
+        },
         scales: { y: { beginAtZero: true } }
       }
     });
