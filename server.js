@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+const fs = require("fs");
 const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord } = require("./databaseCtrl");
 const PORT = process.env.PORT || 3000;
 const app = express();
@@ -133,6 +134,31 @@ app.get("/api/visitors", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch visitors" });
   }
 });
+
+// GET all events (mocked from JSON file)
+app.get("/api/events", async (req, res) => {
+  try {
+    const filePath = path.join(__dirname, "mockEvents.json");
+    const data = fs.readFileSync(filePath, "utf8");
+    const events = JSON.parse(data);
+    res.json(events);
+  } catch (err) {
+    console.error("Error fetching mock events:", err);
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
+});
+
+// GET all events
+/* app.get("/api/events", async (req, res) => {
+  try {
+    await connectDB();
+    const events = await Event.find({});
+    res.json(events);
+  } catch (err) {
+    console.error("Error fetching events:", err);
+    res.status(500).json({ error: "Failed to fetch events" });
+  }
+}); */
 
 // GET historical visitor data
 app.get("/api/visitors/historical", async (req, res) => {

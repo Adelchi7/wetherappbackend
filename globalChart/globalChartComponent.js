@@ -169,6 +169,13 @@ async function fetchVisitorsForEvent(start, end) {
   });
 }
 
+// Fetch events from API
+async function fetchEvents() {
+  const res = await fetch("/api/events");
+  return await res.json();
+}
+
+
 async function fetchVisitorsForEvent(start, end) {
   const res = await fetch('/mockVisitors.json');
   const data = await res.json();
@@ -197,14 +204,43 @@ function aggregateVisitorsByDay(visitors){
 }
 
 // Create historical chart
-async function createHistoricalEventChart(container){
+async function createHistoricalEventChart(container) {
   try {
     const eventData = JSON.parse(container.dataset.event);
-    const visitors = await fetchVisitorsForEvent(eventData.start,eventData.end);
-    const {labels,values} = aggregateVisitorsByDay(visitors);
-    createGlobalChart(container,{labels,values},{event:eventData,filename:`${eventData.title}-chart`});
-  } catch(e){
-    console.error('Error creating historical chart:', e);
+
+    // fetch visitor data in the date range of THIS chart's event
+    const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end);
+    const { labels, values } = aggregateVisitorsByDay(visitors);
+
+    // create the base chart (line chart because opts.event is passed)
+    const chartWrapper = createGlobalChart(
+      container,
+      { labels, values },
+      { event: eventData, filename: `${eventData.title}-chart` }
+    );
+
+    // 🔽 fetch all events for annotations
+    const events = await fetch("/api/events").then(r => r.json());
+
+    // make sure annotation plugin config exists
+    chartWrapper.chart.options.plugins.annotation = chartWrapper.chart.options.plugins.annotation || { annotations: {} };
+
+    // add each event as a shaded box
+    events.forEach(ev => {
+      chartWrapper.chart.options.plugins.annotation.annotations[ev.title] = {
+        type: "box",
+        xMin: ev.start,
+        xMax: ev.end,
+        backgroundColor: "rgba(255,99,132,0.1)",
+        label: { content: ev.title, enabled: true, position: "start" }
+      };
+    });
+
+    chartWrapper.chart.update();
+
+    return chartWrapper;
+  } catch (e) {
+    console.error("Error creating historical chart:", e);
   }
 }
 
