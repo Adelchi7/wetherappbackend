@@ -18,5 +18,5 @@ Thumbs.db
 # Optional: VSCode settings
 .vscode/
 
-globalChart/mockVisitors.json
-globalChart/mockEvents.json
+public/mockVisitors.json
+public/mockEvents.json

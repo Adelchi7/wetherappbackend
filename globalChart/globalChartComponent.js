@@ -209,7 +209,9 @@ async function createHistoricalEventChart(container) {
     const eventData = JSON.parse(container.dataset.event);
 
     // fetch visitor data in the date range of THIS chart's event
-    const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end);
+    /* const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end); */
+    const visitors = await fetch("/mockVisitors.json").then(r => r.json());
+
     const { labels, values } = aggregateVisitorsByDay(visitors);
 
     // create the base chart (line chart because opts.event is passed)

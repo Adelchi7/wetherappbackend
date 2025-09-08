@@ -21,6 +21,8 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "svg")));
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/globalChart', express.static(path.join(__dirname, 'globalChart')));
+app.use(express.static("wetherappBackend/public"));
+
 
 
 // Ping endpoint
