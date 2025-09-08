@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const { Visitor, insertVisitorData, connectDB } = require("./databaseCtrl");
+const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord } = require("./databaseCtrl");
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -208,15 +208,21 @@ app.post('/api/update', async (req, res) => {
   try {
     await connectDB();
 
+    // 1️⃣ Retrieve the existing visitor record
+    const oldRecord = await Visitor.findById(visitorId);
+    if (!oldRecord) {
+      return res.status(404).json({ error: 'Visitor not found' });
+    }
+
+    // 2️⃣ Archive the old record in historical collection
+    await archiveVisitorRecord(oldRecord);
+
+    // 3️⃣ Update the visitor record
     const updated = await Visitor.findByIdAndUpdate(
       visitorId,
       { $set: { ...data, updatedAt: new Date() } },
       { new: true }
     );
-
-    if (!updated) {
-      return res.status(404).json({ error: 'Visitor not found' });
-    }
 
     res.json({ success: true, id: updated._id });
   } catch (err) {

@@ -43,7 +43,9 @@ const visitorSchema = new mongoose.Schema({
 
 
 // Model
-const Visitor = mongoose.model("Visitor", visitorSchema, "data");
+const Visitor = mongoose.model("Visitor", visitorSchema, "data");;
+const Historical = mongoose.model("Historical", visitorSchema, "historical");
+
 
 // MongoDB connection
 const mongoURI = `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_CLUSTER}/${process.env.MONGO_DB}?retryWrites=true&w=majority`;
@@ -64,6 +66,19 @@ async function insertVisitorData(data) {
   return await visitor.save();
 }
 
+// Archive function
+async function archiveVisitorRecord(visitorDoc) {
+  try {
+    const historical = new Historical({
+      ...visitorDoc.toObject(),
+      archivedAt: new Date()
+    });
+    await historical.save();
+  } catch (err) {
+    console.error("Error archiving visitor record:", err);
+  }
+}
+
 // Get all visitors
 async function getAllVisitorsData() {
   await connectDB();
@@ -76,4 +91,5 @@ module.exports = {
   connectDB,           // now available to server.js
   insertVisitorData,
   getAllVisitorsData,
+  archiveVisitorRecord
 };
