@@ -214,10 +214,14 @@ async function createHistoricalEventChart(container) {
     // add each event as box annotation
     events.forEach(ev => {
       if(ev && ev.title && ev.start && ev.end){
+        // find closest labels for xMin/xMax
+        const xMin = chartWrapper.chart.data.labels.find(l => l >= ev.start) || chartWrapper.chart.data.labels[0];
+        const xMax = chartWrapper.chart.data.labels.slice().reverse().find(l => l <= ev.end) || chartWrapper.chart.data.labels[chartWrapper.chart.data.labels.length - 1];
+
         chartWrapper.chart.options.plugins.annotation.annotations[ev.title] = {
           type: "box",
-          xMin: new Date(ev.start),
-          xMax: new Date(ev.end),
+          xMin,
+          xMax,
           backgroundColor: "rgba(255,99,132,0.1)",
           label: { content: ev.title, enabled: true, position: "start" }
         };
