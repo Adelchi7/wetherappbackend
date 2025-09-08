@@ -175,16 +175,6 @@ async function fetchEvents() {
   return await res.json();
 }
 
-
-async function fetchVisitorsForEvent(start, end) {
-  const res = await fetch('/globalChart/mockVisitors.json');
-  const data = await res.json();
-  return data.filter(v => {
-    const created = new Date(v.createdAt);
-    return created >= new Date(start) && created <= new Date(end);
-  });
-}
-
 /* async function fetchVisitorsForEvent(start, end) {
   const res = await fetch(`/api/visitors/historical?start=${start}&end=${end}`);
   return await res.json();

@@ -1,0 +1,172 @@
+[
+  {
+    "emotion": "angry",
+    "color": "var(--red)",
+    "emoji": "🔥",
+    "title": "Angry / Frustrated",
+    "answers": [
+      { "questionId": "q1", "choice": "angry", "emotion": "angry" }
+    ],
+    "coords": { "latitude": 42.375937, "longitude": 14.146462 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-01T10:12:00.000Z",
+    "city": "Chieti",
+    "location": { "type": "Point", "coordinates": [14.146462, 42.375937] },
+    "createdAt": "2025-09-01T10:12:00.000Z"
+  },
+  {
+    "emotion": "sad",
+    "color": "var(--blue)",
+    "emoji": "💧",
+    "title": "Sad / Grieving",
+    "answers": [
+      { "questionId": "q2", "choice": "sad", "emotion": "sad" }
+    ],
+    "coords": { "latitude": 41.9028, "longitude": 12.4964 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-02T11:30:00.000Z",
+    "city": "Rome",
+    "location": { "type": "Point", "coordinates": [12.4964, 41.9028] },
+    "createdAt": "2025-09-02T11:30:00.000Z"
+  },
+  {
+    "emotion": "hopeful",
+    "color": "var(--green)",
+    "emoji": "🌱",
+    "title": "Hopeful / Optimistic",
+    "answers": [
+      { "questionId": "q3", "choice": "hopeful", "emotion": "hopeful" }
+    ],
+    "coords": { "latitude": 48.8566, "longitude": 2.3522 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-03T09:45:00.000Z",
+    "city": "Paris",
+    "location": { "type": "Point", "coordinates": [2.3522, 48.8566] },
+    "createdAt": "2025-09-03T09:45:00.000Z"
+  },
+  {
+    "emotion": "neutral",
+    "color": "var(--gray)",
+    "emoji": "⚪",
+    "title": "Neutral / Indifferent",
+    "answers": [
+      { "questionId": "q4", "choice": "neutral", "emotion": "neutral" }
+    ],
+    "coords": { "latitude": 51.5074, "longitude": -0.1278 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-04T14:20:00.000Z",
+    "city": "London",
+    "location": { "type": "Point", "coordinates": [-0.1278, 51.5074] },
+    "createdAt": "2025-09-04T14:20:00.000Z"
+  },
+  {
+    "emotion": "anxious",
+    "color": "var(--yellow)",
+    "emoji": "⚡",
+    "title": "Anxious / Fearful",
+    "answers": [
+      { "questionId": "q5", "choice": "anxious", "emotion": "anxious" }
+    ],
+    "coords": { "latitude": 40.7128, "longitude": -74.006 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-05T16:10:00.000Z",
+    "city": "New York",
+    "location": { "type": "Point", "coordinates": [-74.006, 40.7128] },
+    "createdAt": "2025-09-05T16:10:00.000Z"
+  },
+  {
+    "emotion": "angry",
+    "color": "var(--red)",
+    "emoji": "🔥",
+    "title": "Angry / Frustrated",
+    "answers": [{ "questionId": "q6", "choice": "angry", "emotion": "angry" }],
+    "coords": { "latitude": 35.6895, "longitude": 139.6917 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-06T10:00:00.000Z",
+    "city": "Tokyo",
+    "location": { "type": "Point", "coordinates": [139.6917, 35.6895] },
+    "createdAt": "2025-09-06T10:00:00.000Z"
+  },
+  {
+    "emotion": "sad",
+    "color": "var(--blue)",
+    "emoji": "💧",
+    "title": "Sad / Grieving",
+    "answers": [{ "questionId": "q7", "choice": "sad", "emotion": "sad" }],
+    "coords": { "latitude": 55.7558, "longitude": 37.6173 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-07T12:45:00.000Z",
+    "city": "Moscow",
+    "location": { "type": "Point", "coordinates": [37.6173, 55.7558] },
+    "createdAt": "2025-09-07T12:45:00.000Z"
+  },
+  {
+    "emotion": "hopeful",
+    "color": "var(--green)",
+    "emoji": "🌱",
+    "title": "Hopeful / Optimistic",
+    "answers": [{ "questionId": "q8", "choice": "hopeful", "emotion": "hopeful" }],
+    "coords": { "latitude": 34.0522, "longitude": -118.2437 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-08T09:30:00.000Z",
+    "city": "Los Angeles",
+    "location": { "type": "Point", "coordinates": [-118.2437, 34.0522] },
+    "createdAt": "2025-09-08T09:30:00.000Z"
+  },
+  {
+    "emotion": "neutral",
+    "color": "var(--gray)",
+    "emoji": "⚪",
+    "title": "Neutral / Indifferent",
+    "answers": [{ "questionId": "q9", "choice": "neutral", "emotion": "neutral" }],
+    "coords": { "latitude": 52.52, "longitude": 13.405 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-09T11:00:00.000Z",
+    "city": "Berlin",
+    "location": { "type": "Point", "coordinates": [13.405, 52.52] },
+    "createdAt": "2025-09-09T11:00:00.000Z"
+  },
+  {
+    "emotion": "anxious",
+    "color": "var(--yellow)",
+    "emoji": "⚡",
+    "title": "Anxious / Fearful",
+    "answers": [{ "questionId": "q10", "choice": "anxious", "emotion": "anxious" }],
+    "coords": { "latitude": 37.7749, "longitude": -122.4194 },
+    "ip": null,
+    "userAgent": "Mozilla/5.0",
+    "language": "en-GB",
+    "platform": "Win32",
+    "timestamp": "2025-09-10T15:20:00.000Z",
+    "city": "San Francisco",
+    "location": { "type": "Point", "coordinates": [-122.4194, 37.7749] },
+    "createdAt": "2025-09-10T15:20:00.000Z"
+  }
+]

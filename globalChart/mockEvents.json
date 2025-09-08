@@ -1,0 +1,52 @@
+[
+  {
+    "title": "Palestine Genocide",
+    "location": "Gaza",
+    "start": "2023-10-07",
+    "end": "2025-12-31",
+    "type": "Conflict",
+    "dominant_emotion": "Angry",
+    "description": "Ongoing genocide and ethnic cleansing against Palestinians by Israel.",
+    "tags": ["genocide", "occupation", "apartheid"]
+  },
+  {
+    "title": "Russia Sanctions",
+    "location": "Global / Russia",
+    "start": "2022-02-24",
+    "end": "2023-12-31",
+    "type": "Economic Sanctions",
+    "dominant_emotion": "Anxious",
+    "description": "Widespread sanctions imposed on Russia following its invasion of Ukraine.",
+    "tags": ["sanctions", "economy", "Ukraine"]
+  },
+  {
+    "title": "US-China Trade Tariffs",
+    "location": "USA / China",
+    "start": "2018-07-06",
+    "end": "2020-01-15",
+    "type": "Economic",
+    "dominant_emotion": "Neutral",
+    "description": "Trade war between the United States and China with tariffs on goods.",
+    "tags": ["tariffs", "trade", "economy"]
+  },
+  {
+    "title": "COVID-19 Pandemic",
+    "location": "Global",
+    "start": "2020-03-11",
+    "end": "2022-12-31",
+    "type": "Health Crisis",
+    "dominant_emotion": "Sad",
+    "description": "Global pandemic leading to millions of deaths, lockdowns, and disruptions.",
+    "tags": ["pandemic", "health", "crisis"]
+  },
+  {
+    "title": "George Floyd Protests",
+    "location": "USA",
+    "start": "2020-05-26",
+    "end": "2020-08-31",
+    "type": "Protest",
+    "dominant_emotion": "Angry",
+    "description": "Mass protests across the United States against police brutality and racism.",
+    "tags": ["protest", "racism", "justice"]
+  }
+]
