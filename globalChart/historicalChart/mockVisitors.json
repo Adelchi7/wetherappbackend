@@ -1,0 +1,7 @@
+[
+  { "date": "2023-10-01", "emotion": "Hopeful" },
+  { "date": "2023-10-02", "emotion": "Sad" },
+  { "date": "2023-10-02", "emotion": "Angry" },
+  { "date": "2023-10-03", "emotion": "Neutral" },
+  { "date": "2023-10-03", "emotion": "Hopeful" }
+]
