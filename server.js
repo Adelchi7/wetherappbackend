@@ -140,7 +140,7 @@ app.get("/api/visitors", async (req, res) => {
 // GET all events (mocked from JSON file)
 app.get("/api/events", async (req, res) => {
   try {
-    const filePath = path.join(__dirname, "mockEvents.json");
+    const filePath = path.join(__dirname, "globalChart", "mockEvents.json");
     const data = fs.readFileSync(filePath, "utf8");
     const events = JSON.parse(data);
     res.json(events);
