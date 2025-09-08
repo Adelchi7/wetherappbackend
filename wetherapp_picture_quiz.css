@@ -94,3 +94,20 @@ header{
 .hint{font-size:12px;color:#a7aab4;margin-top:6px}
 a.inline{color:#a7c7ff}
 .emoji{font-size:20px;margin-right:6px}
+
+.centered-container {
+  text-align: center;
+  margin-top: 50px;
+}
+
+.btn-link {
+  padding: 8px 16px;
+  background: #4CAF50;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+  margin: 0 10px; /* space between buttons */
+}
+
+
