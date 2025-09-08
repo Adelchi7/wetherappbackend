@@ -171,9 +171,17 @@ function initGlobalChartFromDOM(selector){
 
 // Fetch events from API
 async function fetchEvents() {
-  const res = await fetch("/api/events");
-  return await res.json();
+  try {
+    const res = await fetch("/api/events");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Failed to fetch events:", err);
+    return [];
+  }
 }
+
 
 /* async function fetchVisitorsForEvent(start, end) {
   const res = await fetch(`/api/visitors/historical?start=${start}&end=${end}`);
@@ -211,9 +219,7 @@ async function createHistoricalEventChart(container) {
     const eventData = JSON.parse(container.dataset.event);
 
     // fetch visitor data in the date range of THIS chart's event
-    /* const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end); */
     const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end);
-
     const { labels, values } = aggregateVisitorsByDay(visitors);
 
     // create the base chart (line chart because opts.event is passed)
@@ -224,34 +230,48 @@ async function createHistoricalEventChart(container) {
     );
 
     // 🔽 fetch all events for annotations
-    const events = await fetch("/api/events").then(r => r.json());
+    let events = [];
+    try {
+      const res = await fetch("/api/events");
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        events = data;
+      } else {
+        console.warn("Events API did not return an array:", data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch events:", err);
+    }
 
     // make sure annotation plugin config exists
     chartWrapper.chart.options.plugins.annotation = chartWrapper.chart.options.plugins.annotation || { annotations: {} };
 
-    // add each event as a shaded box
+    // add each event as a shaded box if any
     events.forEach(ev => {
-      chartWrapper.chart.options.plugins.annotation.annotations[ev.title] = {
-        type: "box",
-        xMin: ev.start,
-        xMax: ev.end,
-        backgroundColor: "rgba(255,99,132,0.1)",
-        label: { content: ev.title, enabled: true, position: "start" }
-      };
+      if (ev && ev.title && ev.start && ev.end) {
+        chartWrapper.chart.options.plugins.annotation.annotations[ev.title] = {
+          type: "box",
+          xMin: ev.start,
+          xMax: ev.end,
+          backgroundColor: "rgba(255,99,132,0.1)",
+          label: { content: ev.title, enabled: true, position: "start" }
+        };
+      }
     });
 
     chartWrapper.chart.update();
-
     return chartWrapper;
+
   } catch (e) {
     console.error("Error creating historical chart:", e);
   }
 }
 
 // Initialize all historical charts
-(async ()=>{
+(async () => {
   const containers = document.querySelectorAll('[data-event]');
-  for(const c of containers){
+  for (const c of containers) {
     await createHistoricalEventChart(c);
   }
 })();
+
