@@ -157,15 +157,16 @@ function initGlobalChartFromDOM(selector){
 }
 
 // Fetch visitor data for a given event
-async function fetchVisitorsForEvent(start,end){
-  try {
-    const res = await fetch(`/api/visitors?start=${start}&end=${end}`);
-    if(!res.ok) throw new Error('Failed to fetch');
-    return await res.json();
-  } catch(e){
-    console.error('Error fetching visitors:', e);
-    return [];
-  }
+async function fetchVisitorsForEvent(start, end) {
+  const res = await fetch('globalChart/mockVisitors.json');
+  const data = await res.json();
+
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  return data.filter(v => {
+    const d = new Date(v.createdAt);
+    return !isNaN(d) && d >= startDate && d <= endDate;
+  });
 }
 
 // Aggregate visitors by day
