@@ -17,60 +17,108 @@ function createGlobalChart(container, data, opts = {}) {
   const toplabel = card.querySelector('.gc-toplabel');
   const exportBtn = card.querySelector('.gc-export-btn');
 
-  const labels = data.labels.map(l => {
-    const mapping = {
-      '🌱 Hopeful':'Hopeful','Hopeful':'Hopeful','hopeful':'Hopeful',
-      '🔥 Angry':'Angry','Angry':'Angry','angry':'Angry',
-      '💧 Sad':'Sad','Sad':'Sad','sad':'Sad',
-      '⚪ Neutral':'Neutral','Neutral':'Neutral','neutral':'Neutral',
-      '⚡ Anxious':'Anxious','Anxious':'Anxious','anxious':'Anxious'
-    };
-    return mapping[String(l).trim()] || l;
-  });
-  const colors = labels.map(l => WETHER_PALETTE[l] || '#ccc');
-  const total = data.values.reduce((a,b)=>a+(Number(b)||0),0);
+  let chart;
 
-  const chart = new Chart(canvas, {
-    type: 'doughnut',
-    data: { labels, datasets: [{ data: data.values, backgroundColor: colors, borderWidth: 0 }] },
-    options: {
-      maintainAspectRatio: false,
-      cutout: '60%',
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: (ctx) => {
-              const v = ctx.raw || 0;
-              const pct = total ? (v/total*100).toFixed(1)+'%' : '0%';
-              return `${ctx.label}: ${v} (${pct})`;
+  if (opts.event) {
+    // Historical event line chart
+    const labels = data.labels;
+    const values = data.values;
+    chart = new Chart(canvas, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: opts.event.title || 'Visitors',
+          data: values,
+          borderColor: '#4CAF50',
+          backgroundColor: 'rgba(76,175,80,0.2)',
+          fill: true,
+          tension: 0.3
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          tooltip: {
+            callbacks: {
+              label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
+            }
+          },
+          annotation: {
+            annotations: opts.event ? [{
+              type: 'box',
+              xMin: labels[0],
+              xMax: labels[labels.length - 1],
+              backgroundColor: 'rgba(255, 99, 132, 0.1)',
+              label: { content: opts.event.title || '', enabled: true }
+            }] : []
+          }
+        },
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+
+    legendEl.innerHTML = '';
+    toplabel.style.display = 'none'; // hide top label for line chart
+
+  } else {
+    // Doughnut chart (existing logic)
+    const labels = data.labels.map(l => {
+      const mapping = {
+        '🌱 Hopeful':'Hopeful','Hopeful':'Hopeful','hopeful':'Hopeful',
+        '🔥 Angry':'Angry','Angry':'Angry','angry':'Angry',
+        '💧 Sad':'Sad','Sad':'Sad','sad':'Sad',
+        '⚪ Neutral':'Neutral','Neutral':'Neutral','neutral':'Neutral',
+        '⚡ Anxious':'Anxious','Anxious':'Anxious','anxious':'Anxious'
+      };
+      return mapping[String(l).trim()] || l;
+    });
+    const colors = labels.map(l => WETHER_PALETTE[l] || '#ccc');
+    const total = data.values.reduce((a,b)=>a+(Number(b)||0),0);
+
+    chart = new Chart(canvas, {
+      type: 'doughnut',
+      data: { labels, datasets: [{ data: data.values, backgroundColor: colors, borderWidth: 0 }] },
+      options: {
+        maintainAspectRatio: false,
+        cutout: '60%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const v = ctx.raw || 0;
+                const pct = total ? (v/total*100).toFixed(1)+'%' : '0%';
+                return `${ctx.label}: ${v} (${pct})`;
+              }
             }
           }
         }
       }
+    });
+
+    // Build legend
+    legendEl.innerHTML = '';
+    labels.forEach((label,i)=>{
+      const value = data.values[i] || 0;
+      const pct = total ? ((value/total)*100).toFixed(1) : '0.0';
+      const row = document.createElement('div');
+      row.className = 'gc-legend-row';
+      row.innerHTML = `
+        <div class="gc-swatch" style="background:${colors[i]}"></div>
+        <div class="gc-legend-label">${label}</div>
+        <div style="margin-left:auto;font-weight:600">${value} <span style="color:#6b7280;font-weight:500">(${pct}%)</span></div>
+      `;
+      legendEl.appendChild(row);
+    });
+
+    // Top label
+    let topIdx = data.values.indexOf(Math.max(...data.values));
+    if (topIdx>=0 && total>0) {
+      toplabel.querySelector('.large').textContent = `${labels[topIdx]} — ${Math.round((data.values[topIdx]/total)*100)}%`;
+      toplabel.querySelector('.small').textContent = 'dominant emotion';
     }
-  });
-
-  // Build legend
-  legendEl.innerHTML = '';
-  labels.forEach((label, i) => {
-    const value = data.values[i] || 0;
-    const pct = total ? ((value/total)*100).toFixed(1) : '0.0';
-    const row = document.createElement('div');
-    row.className = 'gc-legend-row';
-    row.innerHTML = `
-      <div class="gc-swatch" style="background:${colors[i]}"></div>
-      <div class="gc-legend-label">${label}</div>
-      <div style="margin-left:auto;font-weight:600">${value} <span style="color:#6b7280;font-weight:500">(${pct}%)</span></div>
-    `;
-    legendEl.appendChild(row);
-  });
-
-  // Top label
-  let topIdx = data.values.indexOf(Math.max(...data.values));
-  if (topIdx >= 0 && total > 0) {
-    toplabel.querySelector('.large').textContent = `${labels[topIdx]} — ${Math.round((data.values[topIdx]/total)*100)}%`;
-    toplabel.querySelector('.small').textContent = 'dominant emotion';
   }
 
   // Export
@@ -78,7 +126,7 @@ function createGlobalChart(container, data, opts = {}) {
     const url = chart.toBase64Image();
     const a = document.createElement('a');
     a.href = url;
-    a.download = (opts.filename || 'global-emotion-chart') + '.png';
+    a.download = (opts.filename || 'global-emotion-chart')+'.png';
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -87,9 +135,14 @@ function createGlobalChart(container, data, opts = {}) {
   return {
     chart,
     update(newData){
-      chart.data.labels = newData.labels;
-      chart.data.datasets[0].data = newData.values;
-      chart.data.datasets[0].backgroundColor = newData.labels.map(l => WETHER_PALETTE[l] || '#ccc');
+      if(chart.config.type==='doughnut'){
+        chart.data.labels = newData.labels;
+        chart.data.datasets[0].data = newData.values;
+        chart.data.datasets[0].backgroundColor = newData.labels.map(l => WETHER_PALETTE[l]||'#ccc');
+      } else {
+        chart.data.labels = newData.labels;
+        chart.data.datasets[0].data = newData.values;
+      }
       chart.update();
     },
     destroy(){ chart.destroy(); container.removeChild(card); }
@@ -102,3 +155,33 @@ function initGlobalChartFromDOM(selector){
   const parsed = JSON.parse(dataAttr);
   return createGlobalChart(wrapper, parsed || {labels:[], values:[]});
 }
+
+// Fetch visitor data for a given event
+async function fetchVisitorsForEvent(start,end){
+  const res = await fetch(`/api/visitors?start=${start}&end=${end}`);
+  return await res.json();
+}
+
+// Aggregate visitors by day
+function aggregateVisitorsByDay(visitors){
+  const counts = {};
+  visitors.forEach(v=>{
+    const day = new Date(v.createdAt).toISOString().slice(0,10);
+    counts[day]=(counts[day]||0)+1;
+  });
+  const labels = Object.keys(counts).sort();
+  const values = labels.map(d=>counts[d]);
+  return {labels,values};
+}
+
+// Create historical chart
+async function createHistoricalEventChart(container){
+  const eventData = JSON.parse(container.dataset.event);
+  const visitors = await fetchVisitorsForEvent(eventData.start,eventData.end);
+  const {labels,values} = aggregateVisitorsByDay(visitors);
+
+  return createGlobalChart(container,{labels,values},{event:eventData,filename:`${eventData.title}-chart`});
+}
+
+// Initialize historical charts
+document.querySelectorAll('#chart3-container').forEach(c=>createHistoricalEventChart(c));
