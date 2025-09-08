@@ -134,6 +134,25 @@ app.get("/api/visitors", async (req, res) => {
   }
 });
 
+// GET historical visitor data
+app.get("/api/visitors/historical", async (req, res) => {
+  try {
+    await connectDB();
+    const { start, end } = req.query;
+    const query = {};
+    if (start || end) query.createdAt = {};
+    if (start) query.createdAt.$gte = new Date(start);
+    if (end) query.createdAt.$lte = new Date(end);
+
+    const visitors = await Visitor.find(query).sort({ createdAt: 1 });
+    res.json(visitors);
+  } catch (err) {
+    console.error("Error fetching historical visitors:", err);
+    res.status(500).json({ error: "Failed to fetch historical visitors" });
+  }
+});
+
+
 // Helper: get client IP from request
 function getClientIP(req) {
   return req.headers['x-forwarded-for']?.split(',')[0] || req.socket.remoteAddress;

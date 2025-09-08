@@ -169,6 +169,12 @@ async function fetchVisitorsForEvent(start, end) {
   });
 }
 
+async function fetchVisitorsForEvent(start, end) {
+  const res = await fetch(`/api/visitors/historical?start=${start}&end=${end}`);
+  return await res.json();
+}
+
+
 // Aggregate visitors by day
 function aggregateVisitorsByDay(visitors){
   const counts = {};
