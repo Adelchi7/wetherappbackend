@@ -203,6 +203,18 @@ function aggregateVisitorsByDay(visitors){
   return {labels,values};
 }
 
+async function fetchVisitorsForEvent(start, end) {
+  const res = await fetch("/globalChart/mockVisitors.json"); // or /mockVisitors.json if moved to public
+  const data = await res.json();
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  return data.filter(v => {
+    const created = new Date(v.createdAt);
+    return created >= startDate && created <= endDate;
+  });
+}
+
+
 // Create historical chart
 async function createHistoricalEventChart(container) {
   try {
@@ -210,7 +222,7 @@ async function createHistoricalEventChart(container) {
 
     // fetch visitor data in the date range of THIS chart's event
     /* const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end); */
-    const visitors = await fetch("mockVisitors.json").then(r => r.json());
+    const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end);
 
     const { labels, values } = aggregateVisitorsByDay(visitors);
 
