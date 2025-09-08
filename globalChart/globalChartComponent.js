@@ -177,7 +177,7 @@ async function fetchEvents() {
 
 
 async function fetchVisitorsForEvent(start, end) {
-  const res = await fetch('/mockVisitors.json');
+  const res = await fetch('/globalChart/mockVisitors.json');
   const data = await res.json();
   return data.filter(v => {
     const created = new Date(v.createdAt);
