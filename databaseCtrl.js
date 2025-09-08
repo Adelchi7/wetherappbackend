@@ -43,7 +43,7 @@ const visitorSchema = new mongoose.Schema({
 
 
 // Model
-const Visitor = mongoose.model("Visitor", visitorSchema, "data");;
+const Visitor = mongoose.model("Visitor", visitorSchema, "data");
 const Historical = mongoose.model("Historical", visitorSchema, "historical");
 
 
