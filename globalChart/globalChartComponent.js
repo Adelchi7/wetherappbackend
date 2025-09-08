@@ -157,7 +157,7 @@ function initGlobalChartFromDOM(selector){
 }
 
 // Fetch visitor data for a given event
-async function fetchVisitorsForEvent(start, end) {
+/* async function fetchVisitorsForEvent(start, end) {
   const res = await fetch('globalChart/mockVisitors.json');
   const data = await res.json();
 
@@ -167,7 +167,7 @@ async function fetchVisitorsForEvent(start, end) {
     const d = new Date(v.createdAt);
     return !isNaN(d) && d >= startDate && d <= endDate;
   });
-}
+} */
 
 // Fetch events from API
 async function fetchEvents() {
