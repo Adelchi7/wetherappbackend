@@ -6,9 +6,6 @@ const WETHER_PALETTE = {
   'Anxious': '#FFC107'
 };
 
-// ---------------------------
-// 1. Create a generic chart
-// ---------------------------
 function createGlobalChart(container, data, opts = {}) {
   const tpl = document.getElementById('global-chart-template');
   const node = tpl.content.cloneNode(true);
@@ -23,16 +20,17 @@ function createGlobalChart(container, data, opts = {}) {
   let chart;
 
   if (opts.event) {
-    // ---------------------------
-    // Line chart for historical event
-    // ---------------------------
+    // Historical event line chart
+    const labels = data.labels;
+    const values = data.values;
+
     chart = new Chart(canvas, {
       type: 'line',
       data: {
-        labels: data.labels,
+        labels,
         datasets: [{
           label: opts.event.title || 'Visitors',
-          data: data.values,
+          data: values,
           borderColor: '#4CAF50',
           backgroundColor: 'rgba(76,175,80,0.2)',
           fill: true,
@@ -41,14 +39,6 @@ function createGlobalChart(container, data, opts = {}) {
       },
       options: {
         responsive: true,
-        scales: {
-          x: {
-            type: 'time',
-            time: { parser: 'YYYY-MM-DD', unit: 'day', tooltipFormat: 'YYYY-MM-DD' },
-            title: { display: true, text: 'Date' }
-          },
-          y: { beginAtZero: true }
-        },
         plugins: {
           legend: { display: true },
           tooltip: {
@@ -56,20 +46,16 @@ function createGlobalChart(container, data, opts = {}) {
               label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
             }
           },
-          annotation: {
-            annotations: {}
-          }
-        }
+          annotation: { annotations: {} } // start empty
+        },
+        scales: { y: { beginAtZero: true } }
       }
     });
 
     legendEl.innerHTML = '';
-    toplabel.style.display = 'none';
-
+    toplabel.style.display = 'none'; // hide top label for line chart
   } else {
-    // ---------------------------
-    // Doughnut chart for emotions
-    // ---------------------------
+    // Doughnut chart
     const labels = data.labels.map(l => {
       const mapping = {
         '🌱 Hopeful':'Hopeful','Hopeful':'Hopeful','hopeful':'Hopeful',
@@ -119,8 +105,9 @@ function createGlobalChart(container, data, opts = {}) {
       legendEl.appendChild(row);
     });
 
+    // Top label
     let topIdx = data.values.indexOf(Math.max(...data.values));
-    if (topIdx >= 0 && total > 0) {
+    if (topIdx>=0 && total>0) {
       toplabel.querySelector('.large').textContent = `${labels[topIdx]} — ${Math.round((data.values[topIdx]/total)*100)}%`;
       toplabel.querySelector('.small').textContent = 'dominant emotion';
     }
@@ -154,52 +141,105 @@ function createGlobalChart(container, data, opts = {}) {
   };
 }
 
-// ---------------------------
-// 2. Create historical event chart
-// ---------------------------
+function initGlobalChartFromDOM(selector){
+  const wrapper = document.querySelector(selector);
+  const dataAttr = wrapper.getAttribute('data-emotions');
+  const parsed = JSON.parse(dataAttr);
+  return createGlobalChart(wrapper, parsed || {labels:[], values:[]});
+}
+
+// Fetch visitor data for a given event
+async function fetchVisitorsForEvent(start, end) {
+  const res = await fetch("/globalChart/mockVisitors.json");
+  const data = await res.json();
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  return data.filter(v => {
+    const created = new Date(v.createdAt);
+    return created >= startDate && created <= endDate;
+  });
+}
+
+// Fetch events
+async function fetchEvents() {
+  try {
+    const res = await fetch("/api/events");
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    return Array.isArray(data) ? data : [];
+  } catch (err) {
+    console.error("Failed to fetch events:", err);
+    return [];
+  }
+}
+
+// Aggregate visitors by day
+function aggregateVisitorsByDay(visitors){
+  const counts = {};
+  visitors.forEach(v=>{
+    const day = new Date(v.createdAt).toISOString().slice(0,10);
+    counts[day]=(counts[day]||0)+1;
+  });
+  const labels = Object.keys(counts).sort();
+  const values = labels.map(d=>counts[d]);
+  return {labels,values};
+}
+
+// Create historical chart
 async function createHistoricalEventChart(container) {
   try {
     const eventData = JSON.parse(container.dataset.event);
 
-    // Fetch visitor data
+    // fetch visitor data
     const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end);
     const { labels, values } = aggregateVisitorsByDay(visitors);
 
-    // Create chart
-    const chartWrapper = createGlobalChart(container, { labels, values }, { event: eventData, filename: `${eventData.title}-chart` });
+    // create base chart
+    const chartWrapper = createGlobalChart(
+      container,
+      { labels, values },
+      { event: eventData, filename: `${eventData.title}-chart` }
+    );
 
-    // Fetch other events
+    // fetch events
     let events = await fetchEvents();
+
+    // remove duplicate of current event
     events = events.filter(ev => ev.title !== eventData.title);
 
-    // Add box annotations safely
-    chartWrapper.chart.options.plugins.annotation.annotations = chartWrapper.chart.options.plugins.annotation.annotations || {};
-    events.forEach(ev => {
-      if(ev && ev.title && ev.start && ev.end){
-        chartWrapper.chart.options.plugins.annotation.annotations[ev.title] = {
-          type: "box",
-          xMin: ev.start,
-          xMax: ev.end,
-          backgroundColor: "rgba(255,99,132,0.1)",
-          label: { content: ev.title, enabled: true, position: "start" }
-        };
-      }
-    });
+    // ensure annotation object exists
+  chartWrapper.chart.options.plugins.annotation = chartWrapper.chart.options.plugins.annotation || {};
+  chartWrapper.chart.options.plugins.annotation.annotations = chartWrapper.chart.options.plugins.annotation.annotations || {};
+
+  // add each event as box annotation
+  events.forEach(ev => {
+    if(ev && ev.title && ev.start && ev.end){
+      // find closest labels for xMin/xMax
+      const xMin = chartWrapper.chart.data.labels.find(l => l >= ev.start) || chartWrapper.chart.data.labels[0];
+      const xMax = chartWrapper.chart.data.labels.slice().reverse().find(l => l <= ev.end) || chartWrapper.chart.data.labels[chartWrapper.chart.data.labels.length - 1];
+
+      chartWrapper.chart.options.plugins.annotation.annotations[ev.title] = {
+        type: "box",
+        xMin,
+        xMax,
+        backgroundColor: "rgba(255,99,132,0.1)",
+        label: { content: ev.title, enabled: true, position: "start" }
+      };
+    }
+  });
 
     chartWrapper.chart.update();
     return chartWrapper;
 
-  } catch(e) {
+  } catch (e) {
     console.error("Error creating historical chart:", e);
   }
 }
 
-// ---------------------------
 // Initialize all historical charts
-// ---------------------------
 (async () => {
   const containers = document.querySelectorAll('[data-event]');
-  for(const c of containers){
+  for (const c of containers) {
     await createHistoricalEventChart(c);
   }
 })();
