@@ -23,6 +23,7 @@ function createGlobalChart(container, data, opts = {}) {
     // Historical event line chart
     const labels = data.labels;
     const values = data.values;
+
     chart = new Chart(canvas, {
       type: 'line',
       data: {
@@ -45,17 +46,7 @@ function createGlobalChart(container, data, opts = {}) {
               label: ctx => `${ctx.dataset.label}: ${ctx.raw}`
             }
           },
-          annotation: {
-            annotations: opts.event ? {
-              [opts.event.title]: {
-                type: 'box',
-                xMin: labels[0],
-                xMax: labels[labels.length - 1],
-                backgroundColor: 'rgba(255, 99, 132, 0.1)',
-                label: { content: opts.event.title || '', enabled: true }
-              }
-            } : {}
-          }
+          annotation: { annotations: {} } // start empty
         },
         scales: { y: { beginAtZero: true } }
       }
@@ -63,9 +54,8 @@ function createGlobalChart(container, data, opts = {}) {
 
     legendEl.innerHTML = '';
     toplabel.style.display = 'none'; // hide top label for line chart
-
   } else {
-    // Doughnut chart (existing logic)
+    // Doughnut chart
     const labels = data.labels.map(l => {
       const mapping = {
         '🌱 Hopeful':'Hopeful','Hopeful':'Hopeful','hopeful':'Hopeful',
@@ -159,19 +149,18 @@ function initGlobalChartFromDOM(selector){
 }
 
 // Fetch visitor data for a given event
-/* async function fetchVisitorsForEvent(start, end) {
-  const res = await fetch('globalChart/mockVisitors.json');
+async function fetchVisitorsForEvent(start, end) {
+  const res = await fetch("/globalChart/mockVisitors.json");
   const data = await res.json();
-
   const startDate = new Date(start);
   const endDate = new Date(end);
   return data.filter(v => {
-    const d = new Date(v.createdAt);
-    return !isNaN(d) && d >= startDate && d <= endDate;
+    const created = new Date(v.createdAt);
+    return created >= startDate && created <= endDate;
   });
-} */
+}
 
-// Fetch events from API
+// Fetch events
 async function fetchEvents() {
   try {
     const res = await fetch("/api/events");
@@ -183,13 +172,6 @@ async function fetchEvents() {
     return [];
   }
 }
-
-
-/* async function fetchVisitorsForEvent(start, end) {
-  const res = await fetch(`/api/visitors/historical?start=${start}&end=${end}`);
-  return await res.json();
-} */
-
 
 // Aggregate visitors by day
 function aggregateVisitorsByDay(visitors){
@@ -203,58 +185,39 @@ function aggregateVisitorsByDay(visitors){
   return {labels,values};
 }
 
-async function fetchVisitorsForEvent(start, end) {
-  const res = await fetch("/globalChart/mockVisitors.json"); // or /mockVisitors.json if moved to public
-  const data = await res.json();
-  const startDate = new Date(start);
-  const endDate = new Date(end);
-  return data.filter(v => {
-    const created = new Date(v.createdAt);
-    return created >= startDate && created <= endDate;
-  });
-}
-
-
 // Create historical chart
 async function createHistoricalEventChart(container) {
   try {
     const eventData = JSON.parse(container.dataset.event);
 
-    // fetch visitor data in the date range of THIS chart's event
+    // fetch visitor data
     const visitors = await fetchVisitorsForEvent(eventData.start, eventData.end);
     const { labels, values } = aggregateVisitorsByDay(visitors);
 
-    // create the base chart (line chart because opts.event is passed)
+    // create base chart
     const chartWrapper = createGlobalChart(
       container,
       { labels, values },
       { event: eventData, filename: `${eventData.title}-chart` }
     );
 
-    // 🔽 fetch all events for annotations
-    let events = [];
-    try {
-      const res = await fetch("/api/events");
-      const data = await res.json();
-      if (Array.isArray(data)) {
-        events = data;
-      } else {
-        console.warn("Events API did not return an array:", data);
-      }
-    } catch (err) {
-      console.error("Failed to fetch events:", err);
-    }
+    // fetch events
+    let events = await fetchEvents();
 
-    // make sure annotation plugin config exists
-    chartWrapper.chart.options.plugins.annotation = chartWrapper.chart.options.plugins.annotation || { annotations: {} };
+    // remove duplicate of current event
+    events = events.filter(ev => ev.title !== eventData.title);
 
-    // add each event as a shaded box if any
+    // ensure annotation object exists
+    chartWrapper.chart.options.plugins.annotation = chartWrapper.chart.options.plugins.annotation || {};
+    chartWrapper.chart.options.plugins.annotation.annotations = chartWrapper.chart.options.plugins.annotation.annotations || {};
+
+    // add each event as box annotation
     events.forEach(ev => {
-      if (ev && ev.title && ev.start && ev.end) {
+      if(ev && ev.title && ev.start && ev.end){
         chartWrapper.chart.options.plugins.annotation.annotations[ev.title] = {
           type: "box",
-          xMin: ev.start,
-          xMax: ev.end,
+          xMin: new Date(ev.start),
+          xMax: new Date(ev.end),
           backgroundColor: "rgba(255,99,132,0.1)",
           label: { content: ev.title, enabled: true, position: "start" }
         };
@@ -276,4 +239,3 @@ async function createHistoricalEventChart(container) {
     await createHistoricalEventChart(c);
   }
 })();
-
