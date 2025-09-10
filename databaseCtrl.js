@@ -102,8 +102,8 @@ const pollReplySchema = new mongoose.Schema({
 });
 
 // Models
-const PollQuestion = mongoose.model("PollQuestion", pollQuestionSchema, "questions");
-const PollReply = mongoose.model("PollReply", pollReplySchema, "replies");
+const PollQuestion = mongoose.model("PollQuestion", pollQuestionSchema, "Questions");
+const PollReply = mongoose.model("PollReply", pollReplySchema, "Answers");
 
 
 // Insert a single visitor
