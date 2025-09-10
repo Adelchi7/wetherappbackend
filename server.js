@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord, connectMongoPolls, pollReply, pollQuestion } = require("./databaseCtrl");
+const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord, connectMongoPolls, PollReply, PollQuestion } = require("./databaseCtrl");
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -287,7 +287,7 @@ app.get("/api/polls/active", async (req, res) => {
     console.log("Fetching active polls...");
 
     // Fetch active poll questions
-    const questions = await pollQuestion.find({ isActive: true });
+    const questions = await PollQuestion.find({ isActive: true });
 
     // Log what was fetched
     console.log("Polls fetched:", questions);
@@ -309,7 +309,7 @@ app.post("/api/polls/reply", async (req, res) => {
 
   try {
     await connectMongoPolls();
-    const reply = new pollReply({
+    const reply = new PollReply({
       questionId,
       visitorId: visitorId || null,
       selectedOption: selectedOption || null,
