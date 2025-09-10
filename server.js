@@ -281,11 +281,19 @@ app.post('/api/update', async (req, res) => {
 // GET active polls
 app.get("/api/polls/active", async (req, res) => {
   try {
+    // Connect to MongoDB
     await connectMongoPolls();
+
     console.log("Fetching active polls...");
-    const questions = await pollQuestion.find({ isActive: true });
-    console.log("Polls fetched:", polls);
-    res.json(questions);
+
+    // Fetch active poll questions
+    const questions = await pollQuestion.find({ isActive: true }).toArray(); // ensure it returns an array
+
+    // Log what was fetched
+    console.log("Polls fetched:", questions);
+
+    // Return an empty array if no polls found
+    res.json(questions || []);
   } catch (err) {
     console.error("Failed to fetch active polls:", err);
     res.status(500).json({ error: "Failed to fetch active polls" });
