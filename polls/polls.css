@@ -1,0 +1,5 @@
+body { font-family: Arial, sans-serif; margin: 1em; background: #f5f5f5; }
+header h1 { text-align: center; }
+.poll-card { background: white; }
+button { cursor: pointer; padding: 0.3em 0.6em; border-radius: 4px; border: none; background: #4CAF50; color: white; }
+button:hover { background: #45a049; }

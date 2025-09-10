@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord } = require("./databaseCtrl");
+const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord, connectMongoPolls, pollReply, pollQuestion } = require("./databaseCtrl");
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -275,6 +275,42 @@ app.post('/api/update', async (req, res) => {
   } catch (err) {
     console.error("Error updating visitor:", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+// GET active polls
+app.get("/api/polls/active", async (req, res) => {
+  try {
+    await connectMongoPolls();
+    const questions = await pollQuestion.find({ isActive: true });
+    res.json(questions);
+  } catch (err) {
+    console.error("Failed to fetch active polls:", err);
+    res.status(500).json({ error: "Failed to fetch active polls" });
+  }
+});
+
+// POST poll reply
+app.post("/api/polls/reply", async (req, res) => {
+  const { questionId, visitorId, selectedOption, openText, location } = req.body;
+  if (!questionId || (!selectedOption && !openText)) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    await connectMongoPolls();
+    const reply = new pollReply({
+      questionId,
+      visitorId: visitorId || null,
+      selectedOption: selectedOption || null,
+      openText: openText || null,
+      location: location || null,
+    });
+    await reply.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Failed to save poll reply:", err);
+    res.status(500).json({ error: "Failed to save poll reply" });
   }
 });
 

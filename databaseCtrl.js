@@ -58,6 +58,43 @@ async function connectDB() {
   }
 }
 
+const mongoPollsURI = `mongodb+srv://${process.env.MONGO_USER_POLLS}:${process.env.MONGO_PASS_POLLS}@${process.env.MONGO_CLUSTER_POLLS}/${process.env.MONGO_DB_POLLS}?retryWrites=true&w=majority`;
+
+async function connectMongoPolls() {
+  if (mongoose.connection.readyState === 0) {
+    console.log(
+      "Connecting to MongoDB at URI:",
+      mongoPollsURI.replace(/:(.*)@/, ":****@")
+    );
+    await mongoose.connect(mongoURI); // Mongoose 7+ handles options automatically
+    console.log("✅ MongoDBPolls connected!");
+  }
+}
+
+// -------------------- Polls Models --------------------
+
+// Questions collection
+const pollQuestionSchema = new mongoose.Schema({
+  questionText: String,
+  options: [String],
+  createdAt: { type: Date, default: Date.now },
+  isActive: { type: Boolean, default: true },
+});
+
+// Replies collection
+const pollReplySchema = new mongoose.Schema({
+  questionId: mongoose.Schema.Types.ObjectId,
+  visitorId: String,
+  selectedOption: String,
+  openText: String,
+  submittedAt: { type: Date, default: Date.now },
+  location: { lat: Number, lng: Number },
+});
+
+// Models
+const PollQuestion = mongoose.model("PollQuestion", pollQuestionSchema, "questions");
+const PollReply = mongoose.model("PollReply", pollReplySchema, "replies");
+
 
 // Insert a single visitor
 async function insertVisitorData(data) {
@@ -91,5 +128,8 @@ module.exports = {
   connectDB,           // now available to server.js
   insertVisitorData,
   getAllVisitorsData,
-  archiveVisitorRecord
+  archiveVisitorRecord,  
+  connectMongoPolls,
+  PollQuestion,
+  PollReply
 };
