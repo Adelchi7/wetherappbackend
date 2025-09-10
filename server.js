@@ -287,7 +287,7 @@ app.get("/api/polls/active", async (req, res) => {
     console.log("Fetching active polls...");
 
     // Fetch active poll questions
-    const questions = await pollQuestion.find({ isActive: true }).toArray(); // ensure it returns an array
+    const questions = await pollQuestion.find({ isActive: true });
 
     // Log what was fetched
     console.log("Polls fetched:", questions);
