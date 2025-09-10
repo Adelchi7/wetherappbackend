@@ -282,7 +282,9 @@ app.post('/api/update', async (req, res) => {
 app.get("/api/polls/active", async (req, res) => {
   try {
     await connectMongoPolls();
+    console.log("Fetching active polls...");
     const questions = await pollQuestion.find({ isActive: true });
+    console.log("Polls fetched:", polls);
     res.json(questions);
   } catch (err) {
     console.error("Failed to fetch active polls:", err);
