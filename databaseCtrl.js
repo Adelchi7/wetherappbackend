@@ -66,7 +66,7 @@ async function connectMongoPolls() {
       "Connecting to MongoDB at URI:",
       mongoPollsURI.replace(/:(.*)@/, ":****@")
     );
-    await mongoose.connect(mongoURI); // Mongoose 7+ handles options automatically
+    await mongoose.connect(mongoPollsURI); // Mongoose 7+ handles options automatically
     console.log("✅ MongoDBPolls connected!");
   }
 }
