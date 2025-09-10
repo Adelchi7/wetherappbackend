@@ -58,16 +58,26 @@ async function connectDB() {
   }
 }
 
-const mongoPollsURI = `mongodb+srv://${process.env.MONGO_USER_POLLS}:${process.env.MONGO_PASS_POLLS}@${process.env.MONGO_CLUSTER_POLLS}/${process.env.MONGO_DB_POLLS}?retryWrites=true&w=majority`;
+const mongoUser = process.env.MONGO_USER_POLLS;
+const mongoPass = encodeURIComponent(process.env.MONGO_PASS_POLLS);
+const mongoCluster = process.env.MONGO_CLUSTER_POLLS;
+const mongoDB = process.env.MONGO_DB_POLLS;
+
+const mongoPollsURI = `mongodb+srv://${mongoUser}:${mongoPass}@${mongoCluster}/${mongoDB}?retryWrites=true&w=majority`;
 
 async function connectMongoPolls() {
   if (mongoose.connection.readyState === 0) {
-    console.log(
-      "Connecting to MongoDB at URI:",
-      mongoPollsURI.replace(/:(.*)@/, ":****@")
-    );
-    await mongoose.connect(mongoPollsURI); // Mongoose 7+ handles options automatically
-    console.log("✅ MongoDBPolls connected!");
+    try {
+      console.log(
+        "Connecting to MongoDB at URI:",
+        mongoPollsURI.replace(/:(.*)@/, ":****@")
+      );
+      await mongoose.connect(mongoPollsURI);
+      console.log("✅ MongoDBPolls connected!");
+    } catch (err) {
+      console.error("❌ MongoDB connection failed:", err);
+      throw err;
+    }
   }
 }
 
