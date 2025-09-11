@@ -112,6 +112,11 @@ app.post("/api/choice", async (req, res) => {
   }
 });
 
+app.get("/polls", (req, res) => {
+  res.sendFile(path.join(__dirname, "polls", "polls.html"));
+});
+
+
 // Serve frontend.html at /app
 app.get("/app", (req, res) => {
   res.sendFile(path.join(__dirname, "wetherapp_picture_quiz.html"));
