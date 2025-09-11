@@ -97,4 +97,7 @@ async function loadWorldMap() {
   L.heatLayer(heatPoints, { radius: 50, blur: 25, maxZoom: 17 }).addTo(map);
 }
 
-loadWorldMap();
+document.addEventListener("DOMContentLoaded", async () => {
+  await loadWorldMap();
+});
+
