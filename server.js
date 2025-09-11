@@ -21,6 +21,9 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "svg")));
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/globalChart', express.static(path.join(__dirname, 'globalChart')));
+// Serve polls folder as static
+app.use('/polls', express.static(path.join(__dirname, 'polls')));
+
 
 
 
