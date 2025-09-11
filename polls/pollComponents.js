@@ -54,6 +54,8 @@ class PollQuestion extends HTMLElement {
       });
       if (response.ok) {
         status.textContent = '✅ Thank you for voting!';
+          // Notify parent container that this poll has been answered
+        this.dispatchEvent(new CustomEvent('poll-voted', { bubbles: true }));
       } else {
         status.textContent = '❌ Submission failed.';
       }
