@@ -17,26 +17,22 @@ button:hover { background: #45a049; }
 }
 
 .polls-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 1em;
-  height: 100vh;
   width: 100%;
+  max-width: 400px;
+  margin: 0 auto; /* center */
+  overflow: hidden;
+  position: relative;
 }
 
 #poll-card-container {
-  width: 100%;
-  max-width: 400px;
   display: flex;
-  overflow: hidden;
+  transition: transform 0.3s ease;
 }
 
 poll-question {
-  flex: 0 0 100%; /* full width of container */
-  transition: transform 0.3s ease-in-out;
+  flex: 0 0 100%; /* each card takes full width of container */
 }
+
 
 #poll-navigation {
   margin-top: 1em;

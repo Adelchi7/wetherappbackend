@@ -10,6 +10,7 @@
   <header>
     <h1>🌍 Wetherapp Polls</h1>
   </header>
+
   <div class="polls-wrapper">
     <div id="poll-card-container"></div>
     <div id="poll-navigation">
@@ -17,12 +18,7 @@
     </div>
   </div>
 
-
-  <main>
-    <!-- Poll questions will appear here -->
-    <div id="poll-container"></div>
-  </main>
-
-  <script type="module" src="pollComponents.js"></script>
+  <!-- Only load slider JS; it imports pollComponents -->
+  <script type="module" src="pollSlider.js"></script>
 </body>
 </html>
