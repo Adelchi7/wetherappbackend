@@ -245,12 +245,7 @@ storeBtn.addEventListener('click', async () => {
     color: set.color,
     emoji: set.emoji,
     title: set.title,
-    answers: answers.map((em, i) => ({
-      questionId: questions[i].id,
-      choice: em,
-      emotion: em,
-      visitorId: currentVisitorId || null   // 🔑 ensure visitorId travels with each answer
-    })),
+    answers: answers.map((em,i)=>({questionId: questions[i].id, choice: em, emotion: em})),
     ...visitorInfo
   };
 
@@ -284,27 +279,10 @@ storeBtn.addEventListener('click', async () => {
   }
 });
 
-// Keep backend alive while the user has the page open
-const PING_INTERVAL = 4 * 60 * 1000; // 4 minutes
-
-async function pingServer() {
-  try {
-    await fetch("/ping");
-    console.log("Pinged backend to keep awake");
-  } catch (err) {
-    console.warn("Ping failed:", err);
-  }
-}
-
-// Start pinging
-pingServer();             // initial ping immediately
-setInterval(pingServer, PING_INTERVAL);
-
-
 
 /* storeBtn.addEventListener('click', async () => {
   finalBadge.textContent = "Saving…";
-  const final = computeResult();
+  const final = computeResult();an I stick the
   const set = assets[final];
 
   // Trigger async geolocation + submission but don’t block UI
