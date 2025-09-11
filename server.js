@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs");
-const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord, connectMongoPolls, PollReply, PollQuestion } = require("./databaseCtrl");
+const { Visitor, insertVisitorData, connectDB, archiveVisitorRecord, connectMongoPolls, getPollQuestionModel, getPollReplyModel } = require("./databaseCtrl");
 const PORT = process.env.PORT || 3000;
 const app = express();
 
@@ -287,21 +287,13 @@ app.post('/api/update', async (req, res) => {
 });
 
 // GET active polls
+
 app.get("/api/polls/active", async (req, res) => {
   try {
-    // Connect to MongoDB
-    await connectMongoPolls();
-
-    console.log("Fetching active polls...");
-
-    // Fetch active poll questions
+    const PollQuestion = await getPollQuestionModel();
     const questions = await PollQuestion.find({ isActive: true });
-
-    // Log what was fetched
     console.log("Polls fetched:", questions);
-
-    // Return an empty array if no polls found
-    res.json(questions || []);
+    res.json(questions);
   } catch (err) {
     console.error("Failed to fetch active polls:", err);
     res.status(500).json({ error: "Failed to fetch active polls" });
@@ -316,13 +308,14 @@ app.post("/api/polls/reply", async (req, res) => {
   }
 
   try {
-    await connectMongoPolls();
+    const PollReply = await getPollReplyModel();
     const reply = new PollReply({
       questionId,
       visitorId: visitorId || null,
       selectedOption: selectedOption || null,
       openText: openText || null,
       location: location || null,
+      submittedAt: new Date()
     });
     await reply.save();
     res.json({ success: true });
@@ -331,6 +324,7 @@ app.post("/api/polls/reply", async (req, res) => {
     res.status(500).json({ error: "Failed to save poll reply" });
   }
 });
+
 
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {

@@ -65,7 +65,29 @@ const mongoDB = process.env.MONGO_DB_POLLS;
 
 const mongoPollsURI = `mongodb+srv://${mongoUser}:${mongoPass}@${mongoCluster}/${mongoDB}?retryWrites=true&w=majority`;
 
+let pollsConnection; // store the separate polls connection
+
 async function connectMongoPolls() {
+  if (!pollsConnection) {
+    try {
+      console.log(
+        "Connecting to MongoDB Polls at URI:",
+        mongoPollsURI.replace(/:(.*)@/, ":****@")
+      );
+      pollsConnection = await mongoose.createConnection(mongoPollsURI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+      });
+      console.log("✅ MongoDB Polls connected!");
+    } catch (err) {
+      console.error("❌ MongoDB Polls connection failed:", err);
+      throw err;
+    }
+  }
+  return pollsConnection;
+}
+
+/* async function connectMongoPolls() {
   if (mongoose.connection.readyState === 0) {
     try {
       console.log(
@@ -79,7 +101,7 @@ async function connectMongoPolls() {
       throw err;
     }
   }
-}
+} */
 
 // -------------------- Polls Models --------------------
 
@@ -102,8 +124,19 @@ const pollReplySchema = new mongoose.Schema({
 });
 
 // Models
-const PollQuestion = mongoose.model("PollQuestion", pollQuestionSchema, "Questions");
-const PollReply = mongoose.model("PollReply", pollReplySchema, "Answers");
+// -------------------- Polls Models on separate connection --------------------
+async function getPollQuestionModel() {
+  const conn = await connectMongoPolls();
+  return conn.model("PollQuestion", pollQuestionSchema, "Questions");
+}
+
+async function getPollReplyModel() {
+  const conn = await connectMongoPolls();
+  return conn.model("PollReply", pollReplySchema, "Answers");
+}
+
+/* const PollQuestion = mongoose.model("PollQuestion", pollQuestionSchema, "Questions");
+const PollReply = mongoose.model("PollReply", pollReplySchema, "Answers"); */
 
 
 // Insert a single visitor
@@ -140,6 +173,6 @@ module.exports = {
   getAllVisitorsData,
   archiveVisitorRecord,  
   connectMongoPolls,
-  PollQuestion,
-  PollReply
+  getPollQuestionModel,
+  getPollReplyModel
 };
