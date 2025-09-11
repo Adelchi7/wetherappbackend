@@ -3,3 +3,17 @@ header h1 { text-align: center; }
 .poll-card { background: white; }
 button { cursor: pointer; padding: 0.3em 0.6em; border-radius: 4px; border: none; background: #4CAF50; color: white; }
 button:hover { background: #45a049; }
+#poll-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 1em;
+}
+@media(min-width: 768px) {
+  #poll-container {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+}
+
+
