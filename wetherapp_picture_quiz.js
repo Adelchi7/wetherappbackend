@@ -279,6 +279,23 @@ storeBtn.addEventListener('click', async () => {
   }
 });
 
+// Keep backend alive while the user has the page open
+const PING_INTERVAL = 4 * 60 * 1000; // 4 minutes
+
+async function pingServer() {
+  try {
+    await fetch("/ping");
+    console.log("Pinged backend to keep awake");
+  } catch (err) {
+    console.warn("Ping failed:", err);
+  }
+}
+
+// Start pinging
+pingServer();             // initial ping immediately
+setInterval(pingServer, PING_INTERVAL);
+
+
 
 /* storeBtn.addEventListener('click', async () => {
   finalBadge.textContent = "Saving…";
