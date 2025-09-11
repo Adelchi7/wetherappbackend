@@ -245,7 +245,12 @@ storeBtn.addEventListener('click', async () => {
     color: set.color,
     emoji: set.emoji,
     title: set.title,
-    answers: answers.map((em,i)=>({questionId: questions[i].id, choice: em, emotion: em})),
+    answers: answers.map((em, i) => ({
+      questionId: questions[i].id,
+      choice: em,
+      emotion: em,
+      visitorId: currentVisitorId || null   // 🔑 ensure visitorId travels with each answer
+    })),
     ...visitorInfo
   };
 
