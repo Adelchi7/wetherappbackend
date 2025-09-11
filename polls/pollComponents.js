@@ -41,26 +41,41 @@ class PollQuestion extends HTMLElement {
       return;
     }
 
-    // POST to backend
     try {
+      // Ensure visitorId exists
+      let visitorId = localStorage.getItem("visitorId");
+      if (!visitorId) {
+        const res = await fetch("/api/newVisitor", { method: "POST" });
+        if (res.ok) {
+          const data = await res.json();
+          visitorId = data.id;
+          localStorage.setItem("visitorId", visitorId);
+        } else {
+          throw new Error("Failed to create visitorId");
+        }
+      }
+
+      // POST to backend
       const response = await fetch(`${API_BASE}/reply`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          questionId: this.getAttribute('question-id'),
-          visitorId: localStorage.getItem('visitorId') || null,
+          questionId: this.getAttribute("question-id"),
+          visitorId,
           selectedOption: selected
         })
       });
+
       if (response.ok) {
-        status.textContent = '✅ Thank you for voting!';
-          // Notify parent container that this poll has been answered
-        this.dispatchEvent(new CustomEvent('poll-voted', { bubbles: true }));
+        status.textContent = "✅ Thank you for voting!";
+        // Notify parent container that this poll has been answered
+        this.dispatchEvent(new CustomEvent("poll-voted", { bubbles: true }));
       } else {
-        status.textContent = '❌ Submission failed.';
+        status.textContent = "❌ Submission failed.";
       }
     } catch (err) {
-      status.textContent = '❌ Network error.';
+      console.error("Poll submission error:", err);
+      status.textContent = "❌ Network error.";
     }
   }
 }
