@@ -71,17 +71,20 @@ class PollQuestion extends HTMLElement {
         // Fetch and display results BEFORE enabling Next
         const questionId = this.getAttribute("question-id");
         const resultsRes = await fetch(`${API_BASE}/pollResults?questionId=${questionId}`);
+        if (!resultsRes.ok) throw new Error('Failed to fetch poll results');
         const results = await resultsRes.json();
 
-        // Show results slide
+        // Show results slide if container exists
         const resultsContainer = document.getElementById('poll-results');
-        resultsContainer.innerHTML = `
-          <h3>Results</h3>
-          <ul>
-            ${results.map(r => `<li>${r.option}: ${r.votes} votes</li>`).join('')}
-          </ul>
-        `;
-        resultsContainer.classList.add('active');
+        if (resultsContainer) {
+          resultsContainer.innerHTML = `
+            <h3>Results</h3>
+            <ul>
+              ${results.map(r => `<li>${r.option}: ${r.votes} votes</li>`).join('')}
+            </ul>
+          `;
+          resultsContainer.classList.add('active');
+        }
 
         // Notify parent container that results are ready
         this.dispatchEvent(new CustomEvent("poll-voted", { bubbles: true }));
@@ -97,9 +100,6 @@ class PollQuestion extends HTMLElement {
 }
 
 customElements.define('poll-question', PollQuestion);
-
-// Load polls if needed (optional, polls.js handles main loading)
-// async function loadPolls() { ... }
 
 // -------------------- Load Questions --------------------
 async function loadPolls() {

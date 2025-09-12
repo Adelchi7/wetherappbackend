@@ -300,31 +300,6 @@ app.get("/api/polls/active", async (req, res) => {
   }
 });
 
-app.post("/api/polls/reply", async (req, res) => {
-  const { questionId, visitorId, selectedOption, openText, location } = req.body;
-  if (!questionId || (!selectedOption && !openText)) {
-    return res.status(400).json({ error: "Missing required fields" });
-  }
-
-  try {
-    await connectMongoPolls(); // ✅ ensure Polls DB is used
-    const PollReply = await getPollReplyModel();
-    const reply = new PollReply({
-      questionId,
-      visitorId: visitorId || null,
-      selectedOption: selectedOption || null,
-      openText: openText || null,
-      location: location || null,
-      submittedAt: new Date()
-    });
-    await reply.save();
-    res.json({ success: true });
-  } catch (err) {
-    console.error("Failed to save poll reply:", err);
-    res.status(500).json({ error: "Failed to save poll reply" });
-  }
-});
-
 // POST poll reply
 app.post("/api/polls/reply", async (req, res) => {
   const { questionId, visitorId, selectedOption, openText, location } = req.body;
@@ -350,6 +325,27 @@ app.post("/api/polls/reply", async (req, res) => {
     res.status(500).json({ error: "Failed to save poll reply" });
   }
 });
+
+// GET poll results for a question
+app.get("/api/polls/pollResults", async (req, res) => {
+  const { questionId } = req.query;
+  if (!questionId) return res.status(400).json({ error: "questionId is required" });
+
+  try {
+    const PollReply = await getPollReplyModel();
+    const results = await PollReply.aggregate([
+      { $match: { questionId } },
+      { $group: { _id: "$selectedOption", votes: { $sum: 1 } } }
+    ]);
+
+    const formattedResults = results.map(r => ({ option: r._id, votes: r.votes }));
+    res.json(formattedResults);
+  } catch (err) {
+    console.error("Failed to fetch poll results:", err);
+    res.status(500).json({ error: "Failed to fetch poll results" });
+  }
+});
+
 
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
