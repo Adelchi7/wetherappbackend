@@ -103,7 +103,7 @@ customElements.define('poll-question', PollQuestion);
 
 // -------------------- Load Questions --------------------
 async function loadPolls() {
-  const container = document.getElementById('poll-container');
+  const container = document.getElementById('poll-card-container');
   try {
     const res = await fetch(`${API_BASE}/active`);
     const questions = await res.json();
