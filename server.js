@@ -325,6 +325,31 @@ app.post("/api/polls/reply", async (req, res) => {
   }
 });
 
+app.get("/api/polls/pollResults", async (req, res) => {
+  const qid = req.query.questionId;
+  const db = client.db("wetherapp");
+  const historical = db.collection("historical");
+
+  const results = await historical.aggregate([
+    { $match: { questionId: qid } },
+    {
+      $group: {
+        _id: "$answer",
+        votes: { $sum: 1 }
+      }
+    }
+  ]).toArray();
+
+  res.json({
+    questionId: qid,
+    answers: results.map(r => ({
+      option: r._id,
+      votes: r.votes
+    }))
+  });
+});
+
+
 
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
