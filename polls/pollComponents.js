@@ -1,6 +1,5 @@
 const API_BASE = '/api/polls'; // adjust if needed
 
-// -------------------- <poll-question> --------------------
 class PollQuestion extends HTMLElement {
   constructor() {
     super();
@@ -55,7 +54,7 @@ class PollQuestion extends HTMLElement {
         }
       }
 
-      // POST to backend
+      // Submit vote
       const response = await fetch(`${API_BASE}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,8 +67,25 @@ class PollQuestion extends HTMLElement {
 
       if (response.ok) {
         status.textContent = "✅ Thank you for voting!";
-        // Notify parent container that this poll has been answered
+
+        // Fetch and display results BEFORE enabling Next
+        const questionId = this.getAttribute("question-id");
+        const resultsRes = await fetch(`${API_BASE}/pollResults?questionId=${questionId}`);
+        const results = await resultsRes.json();
+
+        // Show results slide
+        const resultsContainer = document.getElementById('poll-results');
+        resultsContainer.innerHTML = `
+          <h3>Results</h3>
+          <ul>
+            ${results.map(r => `<li>${r.option}: ${r.votes} votes</li>`).join('')}
+          </ul>
+        `;
+        resultsContainer.classList.add('active');
+
+        // Notify parent container that results are ready
         this.dispatchEvent(new CustomEvent("poll-voted", { bubbles: true }));
+
       } else {
         status.textContent = "❌ Submission failed.";
       }
@@ -82,6 +98,8 @@ class PollQuestion extends HTMLElement {
 
 customElements.define('poll-question', PollQuestion);
 
+// Load polls if needed (optional, polls.js handles main loading)
+// async function loadPolls() { ... }
 
 // -------------------- Load Questions --------------------
 async function loadPolls() {

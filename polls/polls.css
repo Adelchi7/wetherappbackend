@@ -38,5 +38,39 @@ poll-question {
   margin-top: 1em;
 }
 
+/* polls.css */
+
+/* Results slide */
+.results-slide {
+  display: none; /* hidden by default */
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  transition: max-height 0.5s ease, opacity 0.5s ease;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.results-slide.active {
+  display: block;
+  opacity: 1;
+}
+
+.results-slide h3 {
+  margin-top: 0;
+}
+
+.results-slide ul {
+  list-style: none;
+  padding: 0;
+}
+
+.results-slide li {
+  margin-bottom: 0.5rem;
+}
+
+
 
 

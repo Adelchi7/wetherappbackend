@@ -12,13 +12,20 @@
   </header>
 
   <div class="polls-wrapper">
+    <!-- Container where poll cards are dynamically injected -->
     <div id="poll-card-container"></div>
+
+    <!-- Results slide: shown after submit before next -->
+    <div id="poll-results" class="results-slide"></div>
+
+    <!-- Navigation -->
     <div id="poll-navigation">
       <button id="nextBtn" disabled>➡ Next</button>
     </div>
   </div>
 
-  <!-- Only load slider JS; it imports pollComponents -->
-  <script type="module" src="pollSlider.js"></script>
+  <!-- JS for polls and results slide -->
+  <script type="module" src="polls.js"></script>
 </body>
 </html>
+
