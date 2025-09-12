@@ -80,7 +80,7 @@ class PollQuestion extends HTMLElement {
           resultsContainer.innerHTML = `
             <h3>Results</h3>
             <ul>
-              ${results.map(r => `<li>${r.option}: ${r.votes} votes</li>`).join('')}
+              ${results.map(r => `<li>${r.selectedOption || r.option}: ${r.count || r.votes || 0} votes</li>`).join('')}
             </ul>
           `;
           resultsContainer.classList.add('active');
