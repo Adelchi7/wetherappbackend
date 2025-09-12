@@ -11,32 +11,14 @@
     <h1>🌍 Wetherapp Polls</h1>
   </header>
 
-  <main class="polls-wrapper">
-    <!-- Container where poll cards will be injected -->
+  <div class="polls-wrapper">
     <div id="poll-card-container"></div>
-
-    <!-- Navigation section -->
     <div id="poll-navigation">
       <button id="nextBtn" disabled>➡ Next</button>
     </div>
-  </main>
+  </div>
 
-  <!-- Template for poll cards -->
-  <template id="poll-card-template">
-    <div class="poll-card">
-      <h2 class="poll-question"></h2>
-      <form class="poll-options"></form>
-
-      <div class="status"></div>
-
-      <!-- ✅ Dedicated result area to slide in -->
-      <div class="results hidden"></div>
-
-      <button type="button" class="submitBtn">Submit</button>
-    </div>
-  </template>
-
-  <!-- JS entrypoint -->
+  <!-- Only load slider JS; it imports pollComponents -->
   <script type="module" src="pollSlider.js"></script>
 </body>
 </html>
