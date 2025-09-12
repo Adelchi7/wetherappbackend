@@ -332,20 +332,23 @@ app.get("/api/polls/pollResults", async (req, res) => {
   if (!questionId) return res.status(400).json({ error: "questionId is required" });
 
   try {
+    await connectMongoPolls(); // make sure we're on Polls DB
     const PollReply = await getPollReplyModel();
+    const { ObjectId } = require('mongodb');
+
     const results = await PollReply.aggregate([
-      { $match: { questionId } },
+      { $match: { questionId: new ObjectId(questionId), selectedOption: { $ne: null } } },
       { $group: { _id: "$selectedOption", votes: { $sum: 1 } } }
     ]);
 
     const formattedResults = results.map(r => ({ option: r._id, votes: r.votes }));
     res.json(formattedResults);
+
   } catch (err) {
     console.error("Failed to fetch poll results:", err);
     res.status(500).json({ error: "Failed to fetch poll results" });
   }
 });
-
 
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
