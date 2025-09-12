@@ -290,9 +290,9 @@ app.post('/api/update', async (req, res) => {
 
 app.get("/api/polls/active", async (req, res) => {
   try {
+    await connectMongoPolls(); // ✅ ensure Polls DB is used
     const PollQuestion = await getPollQuestionModel();
     const questions = await PollQuestion.find({ isActive: true });
-    console.log("Polls fetched:", questions);
     res.json(questions);
   } catch (err) {
     console.error("Failed to fetch active polls:", err);
@@ -300,7 +300,6 @@ app.get("/api/polls/active", async (req, res) => {
   }
 });
 
-// POST poll reply
 app.post("/api/polls/reply", async (req, res) => {
   const { questionId, visitorId, selectedOption, openText, location } = req.body;
   if (!questionId || (!selectedOption && !openText)) {
@@ -308,6 +307,7 @@ app.post("/api/polls/reply", async (req, res) => {
   }
 
   try {
+    await connectMongoPolls(); // ✅ ensure Polls DB is used
     const PollReply = await getPollReplyModel();
     const reply = new PollReply({
       questionId,
@@ -325,6 +325,31 @@ app.post("/api/polls/reply", async (req, res) => {
   }
 });
 
+// POST poll reply
+app.post("/api/polls/reply", async (req, res) => {
+  const { questionId, visitorId, selectedOption, openText, location } = req.body;
+  if (!questionId || (!selectedOption && !openText)) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    await connectMongoPolls(); // ✅ ensure Polls DB is used
+    const PollReply = await getPollReplyModel();
+    const reply = new PollReply({
+      questionId,
+      visitorId: visitorId || null,
+      selectedOption: selectedOption || null,
+      openText: openText || null,
+      location: location || null,
+      submittedAt: new Date()
+    });
+    await reply.save();
+    res.json({ success: true });
+  } catch (err) {
+    console.error("Failed to save poll reply:", err);
+    res.status(500).json({ error: "Failed to save poll reply" });
+  }
+});
 
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
