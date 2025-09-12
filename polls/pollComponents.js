@@ -55,7 +55,7 @@ class PollQuestion extends HTMLElement {
         }
       }
 
-      // POST to backend
+      // Save vote
       const response = await fetch(`${API_BASE}/reply`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -68,8 +68,15 @@ class PollQuestion extends HTMLElement {
 
       if (response.ok) {
         status.textContent = "✅ Thank you for voting!";
-        // Notify parent container that this poll has been answered
-        this.dispatchEvent(new CustomEvent("poll-voted", { bubbles: true }));
+
+        // Fetch results for this question
+        const qid = this.getAttribute("question-id");
+        const resultsRes = await fetch(`${API_BASE}/pollResults?questionId=${qid}`);
+        const results = await resultsRes.json();
+
+        // Render results slide
+        this.showResultsSlide(qid, results);
+
       } else {
         status.textContent = "❌ Submission failed.";
       }
@@ -78,6 +85,33 @@ class PollQuestion extends HTMLElement {
       status.textContent = "❌ Network error.";
     }
   }
+
+  // Helper to show results
+  showResultsSlide(questionId, results) {
+    const container = this.shadowRoot.querySelector(".results");
+    container.innerHTML = "";
+
+    const title = document.createElement("h3");
+    title.textContent = "Results for Question " + questionId;
+    container.appendChild(title);
+
+    results.answers.forEach(ans => {
+      const row = document.createElement("div");
+      row.textContent = `${ans.option}: ${ans.votes}`;
+      container.appendChild(row);
+    });
+
+    // Add Next button
+    const nextBtn = document.createElement("button");
+    nextBtn.textContent = "Next ▶️";
+    nextBtn.onclick = () => {
+      // Notify parent container only after visitor clicks Next
+      this.dispatchEvent(new CustomEvent("poll-voted", { bubbles: true }));
+      container.innerHTML = ""; // clear results
+    };
+    container.appendChild(nextBtn);
+  }
+
 }
 
 customElements.define('poll-question', PollQuestion);
