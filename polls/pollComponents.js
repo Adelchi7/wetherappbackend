@@ -27,8 +27,13 @@ class PollQuestion extends HTMLElement {
       </div>
     `;
 
-    this.shadowRoot.querySelector('button').addEventListener('click', () => this.submit());
-    this.dispatchEvent(new CustomEvent("poll-rendered", { bubbles: true }));
+    this.shadowRoot.querySelector('button')
+        .addEventListener('click', () => this.submit());
+
+    // ✅ Fire poll-rendered after DOM has been painted
+    requestAnimationFrame(() => {
+      this.dispatchEvent(new CustomEvent("poll-rendered", { bubbles: true }));
+    });
   }
 
   async submit() {

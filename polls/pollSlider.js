@@ -29,12 +29,9 @@ async function loadPolls() {
 
 
 // Render a single poll
+// Render a single poll
 function renderPoll(index) {
   showLoading("Loading question...");
-  el.addEventListener("poll-rendered", () => {
-    hideLoading();
-  });
-
 
   container.innerHTML = '';
   resultsSlide.innerHTML = '';
@@ -48,14 +45,11 @@ function renderPoll(index) {
 
   container.appendChild(el);
 
-  // Wait until DOM is painted, then delay hide slightly
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      hideLoading();
-    }, 200); // 200ms buffer gives browser time to draw the card
+  // ✅ Attach event listeners AFTER el is created
+  el.addEventListener("poll-rendered", () => {
+    hideLoading();
   });
 
-  // Listen for submission
   el.addEventListener('poll-voted', async () => {
     const res = await fetch(`/api/polls/pollResults?questionId=${poll._id}`);
     const results = await res.json();
@@ -63,6 +57,11 @@ function renderPoll(index) {
   });
 
   nextBtn.disabled = true;
+
+  // fallback hide in case poll-rendered never fires
+  requestAnimationFrame(() => {
+    setTimeout(() => hideLoading(), 500);
+  });
 }
 
 // Show results slide
