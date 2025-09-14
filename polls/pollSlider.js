@@ -109,7 +109,7 @@ function hideLoading() {
   const loader = document.getElementById("polls-loader");
   if (loader) {
     loader.classList.add("hidden");
-    setTimeout(() => loader.style.display = "none", 300);
+    setTimeout(() => loader.style.display = "none", 1000);
   }
 }
 
