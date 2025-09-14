@@ -31,7 +31,6 @@ async function loadPolls() {
 // Render a single poll
 // Render a single poll
 function renderPoll(index) {
-  showLoading("Loading question...");
 
   container.innerHTML = '';
   resultsSlide.innerHTML = '';
