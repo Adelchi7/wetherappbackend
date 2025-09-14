@@ -47,7 +47,10 @@ function renderPoll(index) {
 
   // ✅ Attach event listeners AFTER el is created
   el.addEventListener("poll-rendered", () => {
-    setTimeout(() => hideLoading(), 300); // 300ms grace period
+    hideLoading();
+    requestAnimationFrame(() => {
+      el.shadowRoot.querySelector('.poll-card').classList.add('visible');
+    });
   });
 
   el.addEventListener('poll-voted', async () => {

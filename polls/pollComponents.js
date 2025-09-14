@@ -31,8 +31,11 @@ class PollQuestion extends HTMLElement {
         .addEventListener('click', () => this.submit());
 
     // ✅ Fire poll-rendered after DOM has been painted
+    // 🔑 Wait until *after paint* before telling parent we’re ready
     requestAnimationFrame(() => {
-      this.dispatchEvent(new CustomEvent("poll-rendered", { bubbles: true }));
+      requestAnimationFrame(() => {
+        this.dispatchEvent(new CustomEvent("poll-rendered", { bubbles: true }));
+      });
     });
   }
 
