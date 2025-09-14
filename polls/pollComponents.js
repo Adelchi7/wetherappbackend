@@ -121,3 +121,12 @@ async function loadPolls() {
 
 // Load polls on page load
 window.addEventListener('DOMContentLoaded', loadPolls);
+
+// -------------------- Hide overlay after full load --------------------
+window.addEventListener("load", () => {
+  const overlay = document.getElementById("loading-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+    setTimeout(() => overlay.style.display = "none", 400);
+  }
+});
