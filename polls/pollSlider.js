@@ -31,6 +31,10 @@ async function loadPolls() {
 // Render a single poll
 function renderPoll(index) {
   showLoading("Loading question...");
+  el.addEventListener("poll-rendered", () => {
+    hideLoading();
+  });
+
 
   container.innerHTML = '';
   resultsSlide.innerHTML = '';
@@ -44,9 +48,11 @@ function renderPoll(index) {
 
   container.appendChild(el);
 
-  // Ensure the new DOM is painted before hiding loader
+  // Wait until DOM is painted, then delay hide slightly
   requestAnimationFrame(() => {
-    hideLoading();
+    setTimeout(() => {
+      hideLoading();
+    }, 200); // 200ms buffer gives browser time to draw the card
   });
 
   // Listen for submission

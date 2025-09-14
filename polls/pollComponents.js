@@ -28,6 +28,7 @@ class PollQuestion extends HTMLElement {
     `;
 
     this.shadowRoot.querySelector('button').addEventListener('click', () => this.submit());
+    this.dispatchEvent(new CustomEvent("poll-rendered", { bubbles: true }));
   }
 
   async submit() {
