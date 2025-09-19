@@ -350,6 +350,45 @@ app.get("/api/polls/pollResults", async (req, res) => {
   }
 });
 
+// --- CREATE POLL API ---
+app.post("/api/createPoll", async (req, res) => {
+  try {
+    const { question, options } = req.body;
+
+    // ✅ Input validation
+    if (!question || typeof question !== "string" || question.trim() === "") {
+      return res.status(400).json({ success: false, message: "Invalid question" });
+    }
+    if (!options || !Array.isArray(options) || options.length < 2) {
+      return res.status(400).json({ success: false, message: "At least 2 options required" });
+    }
+
+    // ✅ Poll document structure
+    const pollDoc = {
+      question: question.trim(),
+      options: options.map(opt => ({
+        text: opt.trim(),
+        votes: 0
+      })),
+      createdAt: new Date(),
+      createdBy: "visitor" // 👈 mark as visitor-created
+    };
+
+    // ✅ Connect to Polls DB
+    const client = new MongoClient(process.env.POLLS_DB_URI);
+    await client.connect();
+    const db = client.db("pollsDB"); // <-- make sure this matches your DB name
+    await db.collection("polls").insertOne(pollDoc);
+    await client.close();
+
+    res.json({ success: true, message: "Poll created successfully" });
+  } catch (err) {
+    console.error("Error creating poll:", err);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+
 // Serve frontend JS
 app.get("/functions.js", (req, res) => {
   res.sendFile(path.join(__dirname, "functions.js"));

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Create a Poll - Wetherapp</title>
+  <link rel="stylesheet" href="createPoll.css" />
+</head>
+<body>
+  <div id="poll-form-container">
+    <h2>📝 Create Your Poll</h2>
+    <form id="createPollForm">
+      <label for="question">Question:</label>
+      <input type="text" id="question" name="question" required />
+
+      <label for="options">Options (one per line):</label>
+      <textarea id="options" name="options" rows="5" required></textarea>
+
+      <button type="submit">✅ Submit Poll</button>
+    </form>
+    <p id="statusMessage"></p>
+  </div>
+
+  <script src="createPoll.js"></script>
+</body>
+</html>

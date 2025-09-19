@@ -1,0 +1,50 @@
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+}
+
+#poll-form-container {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  width: 400px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+input, textarea, button {
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+button {
+  margin-top: 15px;
+  background: #4CAF50;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #43a047;
+}
+
+#statusMessage {
+  margin-top: 15px;
+  font-weight: bold;
+}
