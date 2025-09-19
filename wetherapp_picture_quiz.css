@@ -100,13 +100,13 @@ a.inline{color:#a7c7ff}
   justify-content: center; /* centers the row */
   gap: 16px; /* space between blocks */
   max-width: 500px; /* optional max width */
-  margin: 0 auto; /* horizontally center */
+  margin: 0 auto; /* center container horizontally */
 }
 
 .btn-block {
-  width: 120px; /* fixed block width */
+  width: 120px; /* fixed block width for each button slot */
   display: flex;
-  justify-content: flex-end; /* align button to the right inside block */
+  justify-content: flex-start; /* left-align button inside its block */
 }
 
 .btn-link {
@@ -118,8 +118,9 @@ a.inline{color:#a7c7ff}
   color: white;
   border-radius: 6px;
   font-weight: 500;
-  white-space: nowrap; /* prevents line break */
+  white-space: nowrap; /* prevent icon/text from wrapping */
 }
+
 
 
 
