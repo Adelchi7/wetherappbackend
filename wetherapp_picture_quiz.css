@@ -96,8 +96,17 @@ a.inline{color:#a7c7ff}
 .emoji{font-size:20px;margin-right:6px}
 
 .centered-container {
-  text-align: center;
-  margin-top: 50px;
+  display: flex;
+  justify-content: center; /* center the container horizontally */
+  gap: 8px; /* space between buttons */
+  width: 100%; /* take full width */
+  max-width: 500px; /* optional, limits container size */
+}
+
+.centered-container a.btn-link {
+  flex: 1; /* each button takes equal space */
+  text-align: right; /* text inside button aligned to right */
+  display: block; /* ensure full block width */
 }
 
 .btn-link {
