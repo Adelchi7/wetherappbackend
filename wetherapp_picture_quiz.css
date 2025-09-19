@@ -97,32 +97,29 @@ a.inline{color:#a7c7ff}
 
 .centered-container {
   display: flex;
-  justify-content: center; /* centers the row itself */
-  gap: 16px; /* spacing between button blocks */
-  max-width: 500px; /* optional, limits row width */
-  margin: 0 auto; /* horizontally center the container */
+  justify-content: center; /* centers the row */
+  gap: 16px; /* space between blocks */
+  max-width: 500px; /* optional max width */
+  margin: 0 auto; /* horizontally center */
 }
 
 .btn-block {
-  display: block;
-  width: 120px; /* fixed width for each “block” */
-  text-align: right; /* align the button inside to right */
-}
-
-.centered-container a.btn-link {
-  flex: 1; /* each button takes equal space */
-  text-align: right; /* text inside button aligned to right */
-  display: block; /* ensure full block width */
+  width: 120px; /* fixed block width */
+  display: flex;
+  justify-content: flex-end; /* align button to the right inside block */
 }
 
 .btn-link {
-  padding: 8px 16px;
+  display: inline-flex; /* keeps icon + text on same line */
+  align-items: center; /* vertically center icon + text */
+  text-decoration: none;
+  padding: 6px 10px;
   background: #4CAF50;
   color: white;
-  border-radius: 5px;
-  text-decoration: none;
-  display: inline-block;
-  margin: 0 10px; /* space between buttons */
+  border-radius: 6px;
+  font-weight: 500;
+  white-space: nowrap; /* prevents line break */
 }
+
 
 
