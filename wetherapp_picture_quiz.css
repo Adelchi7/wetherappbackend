@@ -97,10 +97,16 @@ a.inline{color:#a7c7ff}
 
 .centered-container {
   display: flex;
-  justify-content: center; /* center the container horizontally */
-  gap: 8px; /* space between buttons */
-  width: 100%; /* take full width */
-  max-width: 500px; /* optional, limits container size */
+  justify-content: center; /* centers the row itself */
+  gap: 16px; /* spacing between button blocks */
+  max-width: 500px; /* optional, limits row width */
+  margin: 0 auto; /* horizontally center the container */
+}
+
+.btn-block {
+  display: block;
+  width: 120px; /* fixed width for each “block” */
+  text-align: right; /* align the button inside to right */
 }
 
 .centered-container a.btn-link {
