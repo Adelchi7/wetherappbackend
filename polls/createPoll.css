@@ -10,8 +10,10 @@ body {
   background: white;
   padding: 20px;
   border-radius: 12px;
-  width: 400px;
+  width: 100%;
+  max-width: 400px; /* keeps it from getting too wide on desktop */
   box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-sizing: border-box;
 }
 
 h2 {
@@ -47,4 +49,18 @@ button:hover {
 #statusMessage {
   margin-top: 15px;
   font-weight: bold;
+}
+
+@media only screen and (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+
+  input, textarea, button {
+    padding: 8px;
+  }
+
+  h2 {
+    font-size: 1.2em;
+  }
 }
