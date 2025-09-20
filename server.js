@@ -375,7 +375,8 @@ app.post("/api/createPoll", async (req, res) => {
     };
 
     // ✅ Connect to Polls DB
-    const client = new MongoClient(process.env.POLLS_DB_URI);
+    const POLLS_DB_URI = `mongodb+srv://${process.env.MONGO_USER_POLLS}:${process.env.MONGO_PASS_POLLS}@${process.env.MONGO_CLUSTER_POLLS}/${process.env.MONGO_DB_POLLS}?retryWrites=true&w=majority`;
+    const client = new MongoClient(POLLS_DB_URI);
     await client.connect();
     const db = client.db("Polls"); // <-- make sure this matches your DB name
     await db.collection("Questions").insertOne(pollDoc);
