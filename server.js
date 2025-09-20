@@ -351,6 +351,7 @@ app.get("/api/polls/pollResults", async (req, res) => {
 });
 
 // --- CREATE POLL API ---
+
 app.post("/api/createPoll", async (req, res) => {
   try {
     const { question, options } = req.body;
@@ -365,24 +366,19 @@ app.post("/api/createPoll", async (req, res) => {
 
     // ✅ Poll document structure
     const pollDoc = {
-      question: question.trim(),
-      options: options.map(opt => ({
-        text: opt.trim(),
-        votes: 0
-      })),
+      questionText: question.trim(),
+      options: options.map(opt => opt.trim()),
       createdAt: new Date(),
-      createdBy: "visitor" // 👈 mark as visitor-created
+      createdBy: "visitor",
+      isActive: true,
     };
 
-    // ✅ Connect to Polls DB
-    const POLLS_DB_URI = `mongodb+srv://${process.env.MONGO_USER_POLLS}:${process.env.MONGO_PASS_POLLS}@${process.env.MONGO_CLUSTER_POLLS}/${process.env.MONGO_DB_POLLS}?retryWrites=true&w=majority`;
-    const client = new MongoClient(POLLS_DB_URI);
-    await client.connect();
-    const db = client.db(process.env.MONGO_DB_POLLS); // <-- make sure this matches your DB name
-    await db.collection("Questions").insertOne(pollDoc);
-    await client.close();
+    // ✅ Use Mongoose connection from databaseCtrl
+    await connectMongoPolls();
+    const PollQuestion = await getPollQuestionModel();
+    const createdPoll = await PollQuestion.create(pollDoc);
 
-    res.json({ success: true, message: "Poll created successfully" });
+    res.json({ success: true, message: "Poll created successfully", pollId: createdPoll._id });
   } catch (err) {
     console.error("Error creating poll:", err);
     res.status(500).json({ success: false, message: "Server error" });
